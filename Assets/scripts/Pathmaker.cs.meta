@@ -3,7 +3,15 @@ guid: d5575b50532c45f4984a0392f98e35f1
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - floorPrefab: {fileID: 2201163823277442301, guid: 1d3f6aa55c4294e4bbbc1e9df8387c51,
+      type: 3}
+  - pathmakerSpherePrefab: {fileID: 7705944264306792608, guid: 10abe981bb379e844950b147a8e74a51,
+      type: 3}
+  - pathmakerSpherePrefabObject: {fileID: 2814506858530636336, guid: 10abe981bb379e844950b147a8e74a51,
+      type: 3}
+  - floorPrefabObject: {fileID: 2347599725038730385, guid: 1d3f6aa55c4294e4bbbc1e9df8387c51,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
