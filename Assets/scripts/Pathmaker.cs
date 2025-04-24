@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -35,29 +36,37 @@ public class Pathmaker : MonoBehaviour
 
     public GameObject floorPrefabObject;
 
+    public LayerMask pathmakerLayerMask;
+
+    public LayerMask floorLayerMask;
+
     public List<GameObject> PathObjects;
 
     public float waitTime = 0.01f;
 
-    public int maximumAmoundOfPathmaker = 10;
+    public int chanceToChange = 100;
 
-    public int maxPathmakerLife = 5;
+    static public int maxPathmakerLife = 50;
 
     void Start()
     {
-        // Counter automatically set its value to 0
-        counter = 0;
+        for (int i = 0; i == 0; i++)
+        {
+            
+            // Counter automatically set its value to 0
+            counter = 0;
 
-        // set the place to spawn
-        Vector3 spawmPos = new Vector3(0, 0, 0);
+            // set the place to spawn
+            Vector3 spawmPos = new Vector3(0, 0, 0);
 
-        // spawn the first PathMaker
-        GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, spawmPos, Quaternion.Euler(0, 0, 0));
+            // spawn the first PathMaker
+            GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, spawmPos, Quaternion.Euler(0, 0, 0));
 
-        // add PathMaker to private PathMaker list
-        PathObjects.Add(myNewPathmaker);
+            // add PathMaker to private PathMaker list
+            PathObjects.Add(myNewPathmaker);
 
-        StartCoroutine(CentralPathmakerControl());
+            StartCoroutine(CentralPathmakerControl());
+        }
     }
 
 
@@ -72,38 +81,64 @@ public class Pathmaker : MonoBehaviour
     // This is Central Pathmaker Control. Where PathMaker sections is truly executed. The mastermind of this script.
     IEnumerator CentralPathmakerControl()
     {
-        int maxPathmakerAllowed = maximumAmoundOfPathmaker;
 
-        int designatedDistance = 0;
-
-        while (counter <= 500)
+        while (counter <= 500) // Updates overtime as long as the condition is allowed
         {
-            int numOfPathObject = PathObjects.Count;
-
-            bool hasCreatedFloor = false;
-
-            FloorCreation(hasCreatedFloor = true);
-
-            PathmakerUpdate(designatedDistance++, maxPathmakerAllowed, numOfPathObject);
-
-            PathmakerChance(numOfPathObject, maxPathmakerAllowed);
-
-            if (hasCreatedFloor)
+            List<GameObject> pathmakerList = PathObjects;
+            for (int j = 0; j <= maxPathmakerLife; j++) // Calculate general lifespan of Pathmakers
             {
-                yield return new WaitForSeconds(waitTime);
+                //Debug.Log("globalPathmakerLifespan" + j);
+
+                int pathmakerLifeSpan = j;
+
+                int numOfPathObject = PathObjects.Count;
+
+                for (int i = 0; i < PathObjects.Count; i++)
+                {
+                    //Debug.Log("pathmakerIndex" + i);
+
+                    GameObject curPathmaker = PathObjects[i];
+
+                    Vector3 curPathmakerPos = curPathmaker.transform.position;
+
+                    bool hasCreatedFloor = false;
+
+                    if (Physics.CheckSphere(curPathmakerPos, 2, floorLayerMask))
+                    {
+                        Debug.Log("Floor Collided");
+
+                        hasCreatedFloor = true;
+
+                        PathmakerUpdate(i, numOfPathObject);
+
+                        PathmakerChance(i, numOfPathObject, pathmakerLifeSpan, pathmakerList);
+
+                        if (hasCreatedFloor)
+                        {
+                            yield return new WaitForSeconds(waitTime / numOfPathObject);
+                        }
+                    }
+
+                    else
+                    {
+                        Debug.Log("Floor Not Collided");
+
+                        FloorCreation(hasCreatedFloor = true);
+
+                        PathmakerUpdate(i, numOfPathObject);
+
+                        PathmakerChance(i, numOfPathObject, pathmakerLifeSpan, pathmakerList);
+
+                        if (hasCreatedFloor)
+                        {
+                            yield return new WaitForSeconds(waitTime / numOfPathObject);
+                        }
+                    }
+                }
             }
-
         }
-
-        if (counter >= 500)
-        {
-            SelfDestruct();
-        }
-
-        // StartCoroutine(SelfDestruct());
     }
-
-    void PathmakerChance(int numOfPathObject, int maxPathmaker)
+    void PathmakerChance(int i, int numOfPathObject, int distanceLeft, List<GameObject> pathObjectsList)
     {
         //		If counter is less than 50, then:
         //			Generate a random number from 0.0f to 1.0f;
@@ -111,9 +146,16 @@ public class Pathmaker : MonoBehaviour
         //				... Else if number is 0.25f-0.5f, then rotate myself -90 degrees;
         //				... Else if number is 0.99f-1.0f, then instantiate a pathmakerSpherePrefab clone at my current position;
         //			// end elseIf
-        for (int i = 0; i < numOfPathObject; i++)
+
+        float chance = Random.value;
+
+        float pathChance = (float)chanceToChange / 100f;
+
+        if (chance <= pathChance)
         {
             float random = Random.value;
+
+            float randomRotation = Random.value;
 
             GameObject curPathmaker = PathObjects[i];
 
@@ -125,55 +167,52 @@ public class Pathmaker : MonoBehaviour
             {
                 curPathmaker.transform.Rotate(new Vector3(0, 0, -90));
             }
-            else if (random > 0.5f && random <= 0.75f) // 3nd 1/4 chance of nothing happened
-            {
-                curPathmaker.transform.Rotate(new Vector3(0, 0, 0));
-            }
             else if (random > 0.99f && random < 1.0f) // fairly rare chance of duplicating itself.
             {
-                PathDuplicator(i, numOfPathObject, maxPathmaker);
+                PathDuplicator(i);
             }
             else // if it hits 1.0f
             {
-                if (numOfPathObject > 6)
+                while (numOfPathObject > 1 && distanceLeft <= maxPathmakerLife/4)
                 {
-                    //PathDestroyer();
+                    PathmakerExpire(curPathmaker, i, pathObjectsList); // Erase cur Pathmaker given the chance
+                    break;
                 }
             }
-
         }
+
+
     }
-    void PathDuplicator(int i, int CurPathmakerCount, int maxPathmakerAllowDuplicating)
+    void PathDuplicator(int i)
     {
         float chanceToSplit = Random.value;
 
+        GameObject pathmakerPrefab = pathmakerSpherePrefabObject;
+
+        List<GameObject> pathmakerList = PathObjects;
+
         Vector3 curPos = PathObjects[i].transform.position;
 
-        Quaternion none = Quaternion.Euler(0, 0, 90);
-        Quaternion right = Quaternion.Euler(0, 0, 90);
+        Quaternion none = Quaternion.Euler(0, 0, 0);
+        Quaternion right = Quaternion.Euler(0, 0, -90);
         Quaternion left = Quaternion.Euler(0, 0, 90);
 
         if (chanceToSplit <= 0.25f)
         {
-            GameObject prefabclone0 = Instantiate(pathmakerSpherePrefabObject, curPos, none);
-            PathObjects.Add(prefabclone0);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, none);
         }
         else if (chanceToSplit > 0.25f && chanceToSplit <= 0.5f)
         {
-            GameObject prefabclone0 = Instantiate(pathmakerSpherePrefabObject, curPos, right);
-            PathObjects.Add(prefabclone0);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, right);
         }
-        else if (chanceToSplit > 0.25f && chanceToSplit <= 0.75f)
+        else if (chanceToSplit > 0.5f && chanceToSplit <= 0.75f)
         {
-            GameObject prefabclone0 = Instantiate(pathmakerSpherePrefabObject, curPos, left);
-            PathObjects.Add(prefabclone0);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, left);
         }
         else // this is a special case, as it spawns two more other object of its kind 
         {
-            GameObject prefabclone0 = Instantiate(pathmakerSpherePrefabObject, curPos, right);
-            PathObjects.Add(prefabclone0);
-            GameObject prefabclone1 = Instantiate(pathmakerSpherePrefabObject, curPos, left);
-            PathObjects.Add(prefabclone1);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, right);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, left);
         }
     }
 
@@ -195,27 +234,39 @@ public class Pathmaker : MonoBehaviour
     //			Increment counter;
 
 
-    void PathmakerUpdate(int walkedDistance, int maxPathmaker, int numOfPathObject) // Dictates the Pathmaker to moveforward
+    void PathmakerUpdate(int i, int numOfPathObject) // Dictates the Pathmaker to moveforward
     {
         // Local variables
         float moveDistance = 5.0f;
 
         int updatedPathmakerCount = numOfPathObject;
 
-        for (int i = 0; i < updatedPathmakerCount; i++)
+        GameObject curPathmaker = PathObjects[i];
+
+        Vector3 curPathmakerPos = curPathmaker.transform.position;
+
+        if (Physics.CheckSphere(curPathmakerPos, 2, pathmakerLayerMask))
         {
-            GameObject walkingPathmaker = PathObjects[i];
 
-            walkingPathmaker.transform.Translate(0, moveDistance, 0);
+            Debug.Log("Pathmaker collided");
 
-            List<GameObject> pathObjects = PathObjects;
-
-            int PathmakerLife = maxPathmakerLife;
-
-            PathmakerExpire(walkingPathmaker, walkedDistance++, i, maxPathmaker, numOfPathObject, pathObjects, PathmakerLife);
+            float random = Random.value;
+            if (random <= 0.5f)
+            {
+                curPathmaker.transform.Rotate(new Vector3(0, 0, -90));
+                curPathmaker.transform.Translate(0, moveDistance, 0);
+            }
+            else
+            {
+                curPathmaker.transform.Rotate(new Vector3(0, 0, 90));
+                curPathmaker.transform.Translate(0, moveDistance, 0);
+            }
+        }
+        else
+        {
+            curPathmaker.transform.Translate(0, moveDistance, 0);
         }
     }
-
 
     //		Else:
     //			Destroy my game object; 		// self destruct if I've made enough tiles already
@@ -272,19 +323,16 @@ public class Pathmaker : MonoBehaviour
 
 
     // Little section that holds variables for EACH objects in a list. Referencing PathmakerUpdate for deleting pathmaker after certain lifespan.
-    static void PathmakerExpire(GameObject walkingPathmaker, int walkedDistance, int i, int walkerNeededToExpire, int curPathObjectCount, List<GameObject> pathObjects, int maxPathmakerLife)
+
+    static void PathmakerSpawner(List<GameObject> PathmakerObject, GameObject pathmakerSpherePrefabObject, Vector3 curPos, Quaternion rotation)
     {
-        int distanceWalked = walkedDistance;
-
-        int maxLife = maxPathmakerLife;
-
-        Debug.Log(distanceWalked);
-
-        if (distanceWalked > maxLife && curPathObjectCount > walkerNeededToExpire)
-        {
-            Destroy(walkingPathmaker);
-            pathObjects.RemoveAt(i);
-        }
+        GameObject prefabclone1 = Instantiate(pathmakerSpherePrefabObject, curPos, rotation);
+        PathmakerObject.Add(prefabclone1);
+    }
+    static void PathmakerExpire(GameObject walkingPathmaker, int i, List<GameObject> pathObjects)
+    {
+        Destroy(walkingPathmaker);
+        pathObjects.RemoveAt(i);
     }
 
     // b. how would you tune the probabilities to generate lots of long hallways? does it... work?

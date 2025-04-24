@@ -5,14 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pathmaker
+  - PathMaker
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Floor
   - Water
   - UI
-  - 
+  - Pathmaker
   - 
   - 
   - 

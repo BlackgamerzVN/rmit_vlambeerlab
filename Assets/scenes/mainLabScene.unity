@@ -161,10 +161,15 @@ MonoBehaviour:
     type: 3}
   floorPrefabObject: {fileID: 2347599725038730385, guid: 1d3f6aa55c4294e4bbbc1e9df8387c51,
     type: 3}
+  pathmakerLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  floorLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
   PathObjects: []
-  waitTime: 0.5
-  maximumAmoundOfPathmaker: 10
-  maxPathmakerLife: 5
+  waitTime: 0.05
+  chanceToChange: 75
 --- !u!4 &178204312
 Transform:
   m_ObjectHideFlags: 0
