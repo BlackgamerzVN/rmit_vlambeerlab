@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityEditor.Experimental.GraphView;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // INTRO TO PROC GEN LAB
 // all students: complete steps 1-6, as listed in this file
@@ -21,11 +24,19 @@ public class Pathmaker : MonoBehaviour
 
     //	DECLARE CLASS MEMBER VARIABLES:
     //	Declare a private integer called counter that starts at 0; 		// counter will track how many floor tiles I've instantiated
+    [Header("The value we got from input field")]
+
+    public int maxFloorCount;
+
+    public int chanceToChange;
+
+    [Header("Floor and Wall Prefab Properties")]
 
     [SerializeField]
     private List<GameObject> floors;
 
-    public int maxFloorCount;
+    [SerializeField]
+    private LayerMask floorLayerMask;
 
     //	Declare a public Transform called floorPrefab, assign the prefab in inspector;
 
@@ -33,43 +44,205 @@ public class Pathmaker : MonoBehaviour
 
     //	Declare a public Transform called pathmakerSpherePrefab, assign the prefab in inspector; 		// you'll have to make a "pathmakerSphere" prefab later
 
-    public Transform pathmakerSpherePrefab;
-
-    public GameObject pathmakerSpherePrefabObject;
-
     public GameObject floorPrefabObject;
 
     public GameObject wallPrefabObject;
 
-    public LayerMask pathmakerLayerMask;
+    [Header("Pathmaker Prefab Properties")]
 
-    public LayerMask floorLayerMask;
+    [SerializeField]
+    private List<GameObject> PathObjects;
 
-    public List<GameObject> PathObjects;
+    [SerializeField]
+    private LayerMask pathmakerLayerMask;
 
-    public float waitTime = 0.01f;
+    public Transform pathmakerSpherePrefab;
 
-    public int chanceToChange = 100;
+    public GameObject pathmakerSpherePrefabObject;
 
+    [SerializeField]
+    private float waitTime = 0.01f;
+
+    [SerializeField]
     static public int maxPathmakerLife = 50;
+
+    [Header("Pathmaker Script GUI Properties")]
+
+    [SerializeField]
+    private GameObject pathmakerInputGUI;
+
+    [SerializeField]
+    private TMP_Text maxfloorInput;
+
+    [SerializeField]
+    private Slider changeToChangeSlide;
+
+    [SerializeField]
+    private TMP_Text changeToChangeInput;
+
+    [SerializeField]
+    private GameObject stage0Text;
+
+    [SerializeField]
+    private GameObject stage1Text;
+
+    [SerializeField]
+    private GameObject stage2Text;
+
+    [SerializeField]
+    private GameObject stage3Text;
+
+    [Header("Sound Properites")]
+
+    [SerializeField]
+    private AudioSource inputSound;
+    
+    [SerializeField]
+    private AudioSource buttonSound;
+
+    [SerializeField]
+    private AudioSource genCompletedSound;
+
+    [SerializeField]
+    private List<AudioSource> floorGenSoundList;
+    
+    [SerializeField]
+    private List<AudioSource> wallGenSoundList;
+
+    [Header("Post Level Generation Camera Properites")]
+
+    [SerializeField]
+    private float CameraMovementSpeed = 100f;
+
+    private bool CameraMovement = false;
+
+    [SerializeField]
+    private KeyCode UpKey = KeyCode.W;
+
+    [SerializeField]
+    private KeyCode DownKey = KeyCode.S;
+
+    [SerializeField]
+    private KeyCode LeftKey = KeyCode.A;
+
+    [SerializeField]
+    private KeyCode RightKey = KeyCode.D;
+
+    [SerializeField]
+    private KeyCode AltUpKey = KeyCode.UpArrow;
+
+    [SerializeField]
+    private KeyCode AltDownKey = KeyCode.DownArrow;
+
+    [SerializeField]
+    private KeyCode AltLeftKey = KeyCode.LeftArrow;
+
+    [SerializeField]
+    private KeyCode AltRightKey = KeyCode.RightArrow;
 
     void Start()
     {
-        for (int i = 0; i == 0; i++)
+        if (stage0Text != null && stage1Text != null)
         {
-            // set the place to spawn
-            Vector3 spawmPos = new Vector3(0, 0, 0);
+            stage0Text.SetActive(false);
+            stage1Text.SetActive(true);
+        }
 
-            // spawn the first PathMaker
-            GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, spawmPos, Quaternion.Euler(0, 0, 0));
+        // set the place to spawn
+        Vector3 spawmPos = transform.position;
 
-            // add PathMaker to private PathMaker list
-            PathObjects.Add(myNewPathmaker);
+        // spawn the first PathMaker
+        GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, spawmPos, Quaternion.Euler(0, 0, 0));
 
-            StartCoroutine(CentralPathmakerControl());
+        // add PathMaker to private PathMaker list
+        PathObjects.Add(myNewPathmaker);
+
+        // Starts Path Generation Sequence
+        StartCoroutine(CentralPathmakerControl());
+    }
+
+    private void Update()
+    {
+        // Scene Reset Hotkey
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneReset();
+        }
+
+        // Where primary Camera control is located
+        if (CameraMovement == true)
+        {
+            // Move Up control
+            if (Input.GetKey(UpKey) || Input.GetKey(AltUpKey))
+            {
+                Camera.main.transform.Translate(0, CameraMovementSpeed * Time.deltaTime, 0);
+                // Happens once after the key is pressed down
+                HotkeyDebug(UpKey, AltUpKey);
+            }
+
+            // Move Down control
+            if (Input.GetKey(DownKey) || Input.GetKey(AltDownKey))
+            {
+                Camera.main.transform.Translate(0, -CameraMovementSpeed * Time.deltaTime, 0);
+                // Happens once after the key is pressed down
+                HotkeyDebug(DownKey, AltDownKey);
+            }
+
+            // Move Left control
+            if (Input.GetKey(LeftKey) || Input.GetKey(AltLeftKey))
+            {
+                Camera.main.transform.Translate(-CameraMovementSpeed * Time.deltaTime, 0, 0);
+                // Happens once after the key is pressed down
+                HotkeyDebug(LeftKey, AltLeftKey);
+            }
+
+            // Move Right control
+            if (Input.GetKey(RightKey) || Input.GetKey(AltRightKey))
+            {
+                Camera.main.transform.Translate(CameraMovementSpeed * Time.deltaTime, 0, 0);
+                // Happens once after the key is pressed down
+                HotkeyDebug(RightKey, AltRightKey);
+            }
+
+            // Camera Sprint
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                CameraMovementSpeed = CameraMovementSpeed * 2;
+            }
+            
+            // Camera Cancel Sprint
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                CameraMovementSpeed = CameraMovementSpeed / 2;
+            }
+
+            // Camera Zoom in
+            if (Input.GetKey(KeyCode.E))
+            {
+                Camera.main.transform.Translate(0,0,CameraMovementSpeed * Time.deltaTime);
+            }
+            
+            // Camera Zoom Out
+            if (Input.GetKey(KeyCode.Q))
+            {
+                Camera.main.transform.Translate(0, 0, -CameraMovementSpeed * Time.deltaTime);
+            }
         }
     }
 
+    static void HotkeyDebug(KeyCode mainkey, KeyCode altkey)
+    {
+        if (Input.GetKeyDown(mainkey))
+        {
+            //Sent in the log to confirm the movement check
+            Debug.Log("Player pressed " + mainkey);
+        }
+        if (Input.GetKeyDown(altkey))
+        {
+            //Sent in the log to confirm the movement check
+            Debug.Log("Player pressed " + altkey);
+        }
+    }
 
     // Problem 1: Not setting script per individual Pathmaker prefab will makes error pops like crazy
 
@@ -79,13 +252,17 @@ public class Pathmaker : MonoBehaviour
 
     // Basing this project based on Walker Generator worked on past days to complete the script. This is where CentralPathMaker control comes in handy.
 
-    // This is Central Pathmaker Control. Where PathMaker sections is truly executed. The mastermind of this script.
+    // This is Central Pathmaker Control. Where PathMaker sections is truly executed. Like human with brain, so is Pathmaker with collective processing controls.
     IEnumerator CentralPathmakerControl()
     {
-
+        if (maxFloorCount == 0)
+        {
+            maxFloorCount = 200;
+        }
         while (floors.Count <= maxFloorCount) // Updates overtime as long as the condition is allowed
         {
             List<GameObject> pathmakerList = PathObjects;
+
             for (int j = 0; j <= maxPathmakerLife; j++) // Calculate general lifespan of Pathmakers
             {
                 //Debug.Log("globalPathmakerLifespan" + j);
@@ -180,7 +357,8 @@ public class Pathmaker : MonoBehaviour
             }
         }
 
-        StartCoroutine(CreateWall());
+        // Starts Pathmaker Self Destruct Sequence
+        StartCoroutine(PathmakerSelfDestruct());
     }
     void PathmakerChance(int i, int numOfPathObject, int distanceLeft, List<GameObject> pathObjectsList)
     {
@@ -258,6 +436,8 @@ public class Pathmaker : MonoBehaviour
 
     void FloorCreation(bool v)
     {
+        List<AudioSource> floorGenudioSources = floorGenSoundList;
+
         foreach (GameObject curPathmaker in PathObjects)
         {
             Vector3 curPathmakerPos = curPathmaker.transform.position;
@@ -266,7 +446,11 @@ public class Pathmaker : MonoBehaviour
             GameObject prefabfloor = Instantiate(floorPrefabObject, curPathmaker.transform.position, Quaternion.Euler(0, 0, 0), this.transform);
             floors.Add(prefabfloor);
 
-            Camera.main.transform.Translate(0, 0, -0.75f);
+            Camera.main.transform.Translate(0, 0, -0.75f * (1f - (floors.Count / maxFloorCount)) / 2);
+
+            int a = Random.Range(0, floorGenudioSources.Count);
+            AudioSource curFloorAudioSource = floorGenudioSources[a];
+            curFloorAudioSource.Play();
         }
     }
 
@@ -310,36 +494,35 @@ public class Pathmaker : MonoBehaviour
 
     //		Else:
     //			Destroy my game object; 		// self destruct if I've made enough tiles already
-    void PathDestroyer()
-    {
-        float random = Random.value;
-        for (int i = 0; i < PathObjects.Count; i++)
-        {
-            if (random < 0.1f && PathObjects.Count > 1)
-            {
-                PathObjects.RemoveAt(i);
-                break;
-            }
-        }
-    }
-
-    IEnumerator SelfDestruct()
+   
+    // This is where Pathmaker self destructs.
+    IEnumerator PathmakerSelfDestruct()
     {
         while (PathObjects.Count > 0)
         {
-            for (int i = PathObjects.Count; i < 1; i++)
+            for (int i = 0; i < PathObjects.Count; i++)
             {
+                int numOfPathObject = PathObjects.Count;
+
                 GameObject curPathmaker = PathObjects[i];
-                Destroy(curPathmaker);
-                PathObjects.RemoveAt(i);
+
+                List<GameObject> pathObjectsList = PathObjects;
+
+                while (numOfPathObject > 0)
+                {
+                    PathmakerExpire(curPathmaker, i, pathObjectsList);
+
+                    break;
+                }
+
+                yield return new WaitForSeconds(waitTime);
+
             }
         }
-        if (PathObjects.Count == 0)
-        {
-            yield return new WaitForSeconds(0.01f);
-        }
-    }
 
+        // Starts Wall Generation Sequence
+        StartCoroutine(CreateWall());
+    }
 
 
     // MORE STEPS BELOW!!!........
@@ -420,6 +603,73 @@ public class Pathmaker : MonoBehaviour
     // let us tweak various parameters and settings of our tech demo
     // let us click a UI Button to reload the scene, so we don't even need the keyboard anymore.  Throw that thing out!
 
+    public void MaxFloorInputField (string input)
+    {
+        int floorNumInput = int.Parse(input);
+        if (floorNumInput < 0)
+        {
+            maxFloorCount = floorNumInput * -1;
+        }
+        if (floorNumInput == 0)
+        {
+            maxFloorCount = 200;
+        }
+        if (floorNumInput > 0)
+        {
+            maxFloorCount = floorNumInput;
+        }
+        if (inputSound != null)
+        {
+            inputSound.Play();
+        }
+    }
+
+    public void PathmakerChanceSliderInput()
+    {
+        chanceToChange = (int)changeToChangeSlide.value;
+        string changeNum = changeToChangeSlide.value.ToString();
+        //Debug.Log(changeNum);
+        changeToChangeInput.text = changeNum;
+        if (inputSound != null)
+        {
+            inputSound.Play();
+        }
+    }
+
+    public void PathmakerChanceIntInput(string input)
+    {
+        chanceToChange = int.Parse(input);
+        changeToChangeSlide.value = Mathf.Clamp(float.Parse(input), 0, 100);
+        if (inputSound != null)
+        {
+            inputSound.Play();
+        }
+    }
+
+    public void PathmakerStartTrigger()
+    {
+        gameObject.SetActive(true);
+        if (buttonSound != null)
+        {
+            buttonSound.Play();
+        }
+    }
+
+    public void SceneReset()
+    {
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentSceneName);
+    }
+
+    public void ExitGame()
+    {
+        if (buttonSound != null)
+        {
+            buttonSound.Play();
+        }
+        Application.Quit();
+    }
+
     // WALL GENERATION
     // add a "wall pass" to your proc gen after it generates all the floors
     // 1. raycast out from each floor tile (that'd be 4 raycasts per floor tile, in a square "ring" around each tile?)
@@ -427,11 +677,20 @@ public class Pathmaker : MonoBehaviour
     // 3. ... repeat until walls surround your entire floorplan
     // (technically, you will end up raycasting the same spot over and over... but the "proper" way to do this would involve keeping more lists and arrays to track all this data)
 
+    // This is where Walls are created
     IEnumerator CreateWall()
     {
+        if (stage1Text.activeInHierarchy == true && stage2Text != null)
+        {
+            stage1Text.SetActive(false);
+            stage2Text.SetActive(true);
+        }
+
         for (int i = 0; i < floors.Count; ++i)
         {
             bool createdWall = false;
+
+            Transform curTransform = this.transform;
 
             GameObject curFloor = floors[i];
 
@@ -459,15 +718,17 @@ public class Pathmaker : MonoBehaviour
 
             Quaternion downRotation = Quaternion.Euler(0, 0, 180);
 
+            List<AudioSource> wallAudioSourceList = wallGenSoundList;
+
             if (createdWall == false)
             {
-                WallSpawner(wallPrefab, curFloor, curFloorPos, right, rightRotation, distance, floor);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, right, rightRotation, distance, floor, curTransform, wallAudioSourceList);
 
-                WallSpawner(wallPrefab, curFloor, curFloorPos, left, leftRotation, distance, floor);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, left, leftRotation, distance, floor, curTransform, wallAudioSourceList);
 
-                WallSpawner(wallPrefab, curFloor, curFloorPos, up, upRotation, distance, floor);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, up, upRotation, distance, floor, curTransform, wallAudioSourceList);
 
-                WallSpawner(wallPrefab, curFloor, curFloorPos, down, downRotation, distance, floor);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, down, downRotation, distance, floor, curTransform, wallAudioSourceList);
 
                 createdWall = true;
             }
@@ -476,10 +737,26 @@ public class Pathmaker : MonoBehaviour
             {
                 yield return new WaitForSeconds(waitTime);
             }
+
+            if (i == (floors.Count - 1))
+            {
+                Debug.Log("Wall Construction Completed");
+                CameraMovement = true;
+
+                if (stage2Text.activeInHierarchy == true && stage3Text != null)
+                {
+                    stage2Text.SetActive(false);
+                    stage3Text.SetActive(true);
+                }
+                if (genCompletedSound != null)
+                {
+                    genCompletedSound.Play();
+                }
+            }
         }
     }
 
-    static void WallSpawner(GameObject wallPrefab, GameObject curFloor, Vector3 curFloorPos, Vector3 direction, Quaternion rotation, float distance, LayerMask floor)
+    static void WallSpawner(GameObject wallPrefab, GameObject curFloor, Vector3 curFloorPos, Vector3 direction, Quaternion rotation, float distance, LayerMask floor, Transform thisTransform, List<AudioSource> wallAudioSourceList)
     {
         if (Physics.Raycast(curFloorPos, direction, distance, floor))
         {
@@ -487,9 +764,13 @@ public class Pathmaker : MonoBehaviour
         }
         else
         {
-            GameObject prefabclone = Instantiate(wallPrefab, curFloorPos, rotation);
+            GameObject prefabclone = Instantiate(wallPrefab, curFloorPos, rotation, thisTransform);
             prefabclone.transform.Translate(0, 5, 0);
             Debug.Log("Wall Built");
+
+            int a = Random.Range(0, wallAudioSourceList.Count);
+            AudioSource curWallAudioSource = wallAudioSourceList[a];
+            curWallAudioSource.Play();
         }
     }
 }
