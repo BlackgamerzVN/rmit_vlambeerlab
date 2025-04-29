@@ -38,15 +38,23 @@ public class Pathmaker : MonoBehaviour
     [SerializeField]
     private LayerMask floorLayerMask;
 
-    //	Declare a public Transform called floorPrefab, assign the prefab in inspector;
+    [SerializeField]
+    private LayerMask wallLayerMask;
 
-    public Transform floorPrefab;
+    [SerializeField]
+    private LayerMask floorAndWallLayerMask;
+
+    //	Declare a public Transform called floorPrefab, assign the prefab in inspector;
 
     //	Declare a public Transform called pathmakerSpherePrefab, assign the prefab in inspector; 		// you'll have to make a "pathmakerSphere" prefab later
 
     public GameObject floorPrefabObject;
 
     public GameObject wallPrefabObject;
+
+    public GameObject scannerPrefabObject;
+
+    public GameObject playerPrefabObject;
 
     [Header("Pathmaker Prefab Properties")]
 
@@ -55,8 +63,6 @@ public class Pathmaker : MonoBehaviour
 
     [SerializeField]
     private LayerMask pathmakerLayerMask;
-
-    public Transform pathmakerSpherePrefab;
 
     public GameObject pathmakerSpherePrefabObject;
 
@@ -259,6 +265,12 @@ public class Pathmaker : MonoBehaviour
         {
             maxFloorCount = 200;
         }
+
+        // Value finalization
+        int maxFloor = maxFloorCount;
+
+        float pathChance = (float)chanceToChange / 100f;
+
         while (floors.Count <= maxFloorCount) // Updates overtime as long as the condition is allowed
         {
             List<GameObject> pathmakerList = PathObjects;
@@ -291,7 +303,7 @@ public class Pathmaker : MonoBehaviour
 
                     if (Physics.CheckSphere(curPathmakerPos, 1.5f, pathmakerLayerMask)) // If there are other pathmaker in proximity, disable PathmakerChance and force them to rotate other direction.
                     {
-                        if (Physics.CheckSphere(curPathmakerPos, 2, floorLayerMask)) // If the area below it is FLOOR, DO NOT create floor
+                        if (Physics.CheckSphere(curPathmakerPos, 2, floorAndWallLayerMask)) // If the area below it is FLOOR, DO NOT create floor
                         {
                             Debug.Log("Floor Collided");
 
@@ -321,7 +333,7 @@ public class Pathmaker : MonoBehaviour
                     }
                     else // If there are no other pathmaker in proximity, PathmakerChance operates as normal
                     {
-                        if (Physics.CheckSphere(curPathmakerPos, 2, floorLayerMask)) // If the area below it is FLOOR, DO NOT create floor
+                        if (Physics.CheckSphere(curPathmakerPos, 2, floorAndWallLayerMask)) // If the area below it is FLOOR, DO NOT create floor
                         {
                             Debug.Log("Floor Collided");
 
@@ -329,7 +341,7 @@ public class Pathmaker : MonoBehaviour
 
                             PathmakerUpdate(i, numOfPathObject);
 
-                            PathmakerChance(i, numOfPathObject, pathmakerLifeSpan, pathmakerList);
+                            PathmakerChance(i, numOfPathObject, pathmakerLifeSpan, pathmakerList, pathChance);
 
                             if (hasCreatedFloor)
                             {
@@ -345,7 +357,7 @@ public class Pathmaker : MonoBehaviour
 
                             PathmakerUpdate(i, numOfPathObject);
 
-                            PathmakerChance(i, numOfPathObject, pathmakerLifeSpan, pathmakerList);
+                            PathmakerChance(i, numOfPathObject, pathmakerLifeSpan, pathmakerList, pathChance);
 
                             if (hasCreatedFloor)
                             {
@@ -360,7 +372,7 @@ public class Pathmaker : MonoBehaviour
         // Starts Pathmaker Self Destruct Sequence
         StartCoroutine(PathmakerSelfDestruct());
     }
-    void PathmakerChance(int i, int numOfPathObject, int distanceLeft, List<GameObject> pathObjectsList)
+    void PathmakerChance(int i, int numOfPathObject, int distanceLeft, List<GameObject> pathObjectsList, float pathChance)
     {
         //		If counter is less than 50, then:
         //			Generate a random number from 0.0f to 1.0f;
@@ -370,8 +382,6 @@ public class Pathmaker : MonoBehaviour
         //			// end elseIf
 
         float chance = Random.value;
-
-        float pathChance = (float)chanceToChange / 100f;
 
         if (chance <= pathChance)
         {
@@ -598,6 +608,75 @@ public class Pathmaker : MonoBehaviour
     // 2. then calculate the average position of all of them (use a for() loop to go through the whole list) 
     // 3. then move your camera to that averaged center and make sure fieldOfView is wide enough?
 
+    // LevelSizeScanner utilize individual Raycast System on each spawned objects
+    // It is primary used to measure potential maximum and minimum size of the level generator, both horizonally and vertically
+    IEnumerator LevelSizeScanner()
+    {
+        // Finalize max floor count to use as max height
+        int maxHeight = maxFloorCount;
+
+        // Scanner Walk Distance
+        int moveDistance = 5;
+
+        // Boolean used for the entire action sequence
+
+        bool playerSpawned = false;
+
+        List<GameObject> prefabScannerList = new List<GameObject>();
+
+        // It will first climb up from top to bottom of level gen on the Y axis
+
+        // Spawns prefab Scanner Objects that also serves as the medium for where the scanner "moves" by Raycasting
+
+        // Once their purposes are done, remove all prefab Scanner Objects.
+
+        for (int i = maxHeight * moveDistance; i >= -maxHeight * moveDistance; i -= moveDistance)
+        {
+            bool floorcheck = false;
+
+            int curheight = i;
+
+            Vector3 spawnPos = new Vector3(-maxHeight * moveDistance, curheight, 0);
+
+            // spawn Scanner Object
+            GameObject prefabScanner = Instantiate(scannerPrefabObject, spawnPos, Quaternion.Euler(0, 0, 0));
+            prefabScannerList.Add(prefabScanner);
+
+            Vector3 right = prefabScanner.transform.TransformDirection(Vector3.right);
+
+            // list of floor collision the raycast hit
+            RaycastHit[] floorHits;
+
+            floorHits = Physics.RaycastAll(spawnPos, right, maxHeight * moveDistance, floorLayerMask);
+
+            for (int j = 0; j < floorHits.Length; j++)
+            {
+                RaycastHit curFloorHit = floorHits[j];
+
+                // Collect current floor Object amongst the list of objects hit by raycast
+                GameObject curFloorSelected = curFloorHit.transform.gameObject;
+
+                Vector3 curFloorPosition = curFloorSelected.transform.position;
+
+                Vector3 down = curFloorSelected.transform.TransformDirection(Vector3.down);
+
+                // Checks if there is wall below the selected floor object 
+                if (Physics.Raycast(curFloorPosition, down, moveDistance, wallLayerMask))
+                {
+                    floorcheck = true;
+                }
+
+                if (floorcheck == true && playerSpawned == false) 
+                {
+                    yield return new WaitForSeconds(waitTime);
+                    playerSpawned = true;
+                    GameObject prefabfloor = Instantiate(playerPrefabObject, curFloorSelected.transform.position, Quaternion.Euler(0, 0, 0));
+                    Debug.Log("Spanwed Player");
+                }
+            }
+        }
+    }
+
     // BETTER UI:
     // learn how to use UI Sliders (https://unity3d.com/learn/tutorials/topics/user-interface-ui/ui-slider) 
     // let us tweak various parameters and settings of our tech demo
@@ -696,7 +775,7 @@ public class Pathmaker : MonoBehaviour
 
             Vector3 curFloorPos = curFloor.transform.position;
 
-            LayerMask floor = floorLayerMask;
+            LayerMask floorAndWall = floorAndWallLayerMask;
 
             GameObject wallPrefab = wallPrefabObject;
 
@@ -722,13 +801,13 @@ public class Pathmaker : MonoBehaviour
 
             if (createdWall == false)
             {
-                WallSpawner(wallPrefab, curFloor, curFloorPos, right, rightRotation, distance, floor, curTransform, wallAudioSourceList);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, right, rightRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
 
-                WallSpawner(wallPrefab, curFloor, curFloorPos, left, leftRotation, distance, floor, curTransform, wallAudioSourceList);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, left, leftRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
 
-                WallSpawner(wallPrefab, curFloor, curFloorPos, up, upRotation, distance, floor, curTransform, wallAudioSourceList);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, up, upRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
 
-                WallSpawner(wallPrefab, curFloor, curFloorPos, down, downRotation, distance, floor, curTransform, wallAudioSourceList);
+                WallSpawner(wallPrefab, curFloor, curFloorPos, down, downRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
 
                 createdWall = true;
             }
@@ -754,11 +833,13 @@ public class Pathmaker : MonoBehaviour
                 }
             }
         }
+
+        StartCoroutine(LevelSizeScanner());
     }
 
-    static void WallSpawner(GameObject wallPrefab, GameObject curFloor, Vector3 curFloorPos, Vector3 direction, Quaternion rotation, float distance, LayerMask floor, Transform thisTransform, List<AudioSource> wallAudioSourceList)
+    static void WallSpawner(GameObject wallPrefab, GameObject curFloor, Vector3 curFloorPos, Vector3 direction, Quaternion rotation, float distance, LayerMask floorAndWall, Transform thisTransform, List<AudioSource> wallAudioSourceList)
     {
-        if (Physics.Raycast(curFloorPos, direction, distance, floor))
+        if (Physics.Raycast(curFloorPos, direction, distance, floorAndWall))
         {
             Debug.Log("Wall Not Buildable");
         }
