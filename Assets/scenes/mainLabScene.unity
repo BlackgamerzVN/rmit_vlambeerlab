@@ -420,7 +420,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5575b50532c45f4984a0392f98e35f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxFloorCount: 0
   chanceToChange: 75
   floors: []
   floorLayerMask:
@@ -5178,7 +5177,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 3000
   field of view: 60
-  orthographic: 0
+  orthographic: 1
   orthographic size: 140
   m_Depth: -1
   m_CullingMask:

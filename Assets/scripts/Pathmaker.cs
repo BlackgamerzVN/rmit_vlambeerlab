@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using skner.DualGrid;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +27,16 @@ public class Pathmaker : MonoBehaviour
     //	Declare a private integer called counter that starts at 0; 		// counter will track how many floor tiles I've instantiated
     [Header("The value we got from input field")]
 
-    static public int maxFloorCount;
+    static public int maxFloorCount = 1000;
 
-    public int chanceToChange;
+    public int chanceToChange = 75;
+
+    private int movementDistance = 1;
 
     [Header("Floor and Wall Prefab Properties")]
 
     [SerializeField]
-    private List<GameObject> floors;
+    private int floors;
 
     [SerializeField]
     private LayerMask floorLayerMask;
@@ -47,10 +50,6 @@ public class Pathmaker : MonoBehaviour
     //	Declare a public Transform called floorPrefab, assign the prefab in inspector;
 
     //	Declare a public Transform called pathmakerSpherePrefab, assign the prefab in inspector; 		// you'll have to make a "pathmakerSphere" prefab later
-
-    public GameObject floorPrefabObject;
-
-    public GameObject wallPrefabObject;
 
     public GameObject scannerPrefabObject;
 
@@ -145,6 +144,18 @@ public class Pathmaker : MonoBehaviour
 
     [SerializeField]
     private KeyCode AltRightKey = KeyCode.RightArrow;
+    public enum Grid
+    {
+        FLOOR,
+        WALL,
+        EMPTY
+    }
+    // Variables
+    public Grid[,] gridHandler;
+
+    public DualGridTilemapModule floorDualGridTilemap;
+
+    public DualGridTilemapModule wallDualGridTilemap;
 
     void Start()
     {
@@ -157,11 +168,7 @@ public class Pathmaker : MonoBehaviour
         // set the place to spawn
         Vector3 spawmPos = transform.position;
 
-        // spawn the first PathMaker
-        GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, spawmPos, Quaternion.Euler(0, 0, 0));
-
-        // add PathMaker to private PathMaker list
-        PathObjects.Add(myNewPathmaker);
+        
 
         // Starts Path Generation Sequence
         StartCoroutine(CentralPathmakerControl());
@@ -266,12 +273,30 @@ public class Pathmaker : MonoBehaviour
             maxFloorCount = 200;
         }
 
+        gridHandler = new Grid[maxFloorCount * 2 - 1, maxFloorCount * 2 - 1];
+
+        for (int x = 0; x < gridHandler.GetLength(0); x++)
+        {
+            for (int y = 0; y < gridHandler.GetLength(1); y++)
+            {
+                gridHandler[x, y] = Grid.EMPTY;
+            }
+        }
+
+        Vector3Int TileCenter = new Vector3Int(gridHandler.GetLength(0) / 2, gridHandler.GetLength(1) / 2, 0);
+
+        // spawn the first PathMaker
+        GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, TileCenter + new Vector3(0.5f, 0.5f, 0), Quaternion.Euler(0, 0, 0));
+
+        // add PathMaker to private PathMaker list
+        PathObjects.Add(myNewPathmaker);
+
         // Value finalization
         int maxFloor = maxFloorCount;
 
         float pathChance = (float)chanceToChange / 100f;
 
-        while (floors.Count <= maxFloorCount) // Updates overtime as long as the condition is allowed
+        while (floors <= maxFloorCount) // Updates overtime as long as the condition is allowed
         {
             List<GameObject> pathmakerList = PathObjects;
 
@@ -301,9 +326,9 @@ public class Pathmaker : MonoBehaviour
 
                     // Problem: Overlap tile is still appearing during duplication. However minimal. Inaccuracies is now only in 1 digits.
 
-                    if (Physics.CheckSphere(curPathmakerPos, 1.5f, pathmakerLayerMask)) // If there are other pathmaker in proximity, disable PathmakerChance and force them to rotate other direction.
+                    if (Physics.CheckSphere(curPathmakerPos, 0f, pathmakerLayerMask)) // If there are other pathmaker in proximity, disable PathmakerChance and force them to rotate other direction.
                     {
-                        if (Physics.CheckSphere(curPathmakerPos, 2, floorAndWallLayerMask)) // If the area below it is FLOOR, DO NOT create floor
+                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] == Grid.FLOOR) // If the area below it is FLOOR, DO NOT create floor
                         {
                             Debug.Log("Floor Collided");
 
@@ -317,11 +342,11 @@ public class Pathmaker : MonoBehaviour
                             }
                         }
 
-                        else // If the area below it is NOT floor, DO create floor
+                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] != Grid.FLOOR) // If the area below it is NOT floor, DO create floor
                         {
                             Debug.Log("Floor Not Collided");
 
-                            FloorCreation(hasCreatedFloor = true);
+                            FloorCreation(hasCreatedFloor = true, floors++);
 
                             PathmakerUpdate(i, numOfPathObject);
 
@@ -333,7 +358,7 @@ public class Pathmaker : MonoBehaviour
                     }
                     else // If there are no other pathmaker in proximity, PathmakerChance operates as normal
                     {
-                        if (Physics.CheckSphere(curPathmakerPos, 2, floorAndWallLayerMask)) // If the area below it is FLOOR, DO NOT create floor
+                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] == Grid.FLOOR) // If the area below it is FLOOR, DO NOT create floor
                         {
                             Debug.Log("Floor Collided");
 
@@ -349,11 +374,11 @@ public class Pathmaker : MonoBehaviour
                             }
                         }
 
-                        else // If the area below it is NOT floor, DO create floor
+                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] != Grid.FLOOR) // If the area below it is NOT floor, DO create floor
                         {
                             Debug.Log("Floor Not Collided");
 
-                            FloorCreation(hasCreatedFloor = true);
+                            FloorCreation(hasCreatedFloor = true, floors++);
 
                             PathmakerUpdate(i, numOfPathObject);
 
@@ -386,8 +411,6 @@ public class Pathmaker : MonoBehaviour
         if (chance <= pathChance)
         {
             float random = Random.value;
-
-            float randomRotation = Random.value;
 
             GameObject curPathmaker = PathObjects[i];
 
@@ -444,23 +467,22 @@ public class Pathmaker : MonoBehaviour
 
     //			Instantiate a floorPrefab clone at current position;
 
-    void FloorCreation(bool v)
+    void FloorCreation(bool v, int e)
     {
         List<AudioSource> floorGenudioSources = floorGenSoundList;
 
         foreach (GameObject curPathmaker in PathObjects)
         {
-            Vector3 curPathmakerPos = curPathmaker.transform.position;
-            float curPathmakerPosX = curPathmakerPos.x;
-            float curPathmakerPosY = curPathmakerPos.y;
-            GameObject prefabfloor = Instantiate(floorPrefabObject, curPathmaker.transform.position, Quaternion.Euler(0, 0, 0), this.transform);
-            floors.Add(prefabfloor);
+            Vector3Int curPathmakerPos = Vector3Int.FloorToInt(curPathmaker.transform.position);
+            floorDualGridTilemap.DataTilemap.SetTile(Vector3Int.FloorToInt(curPathmakerPos), floorDualGridTilemap.DataTile);
+            gridHandler[curPathmakerPos.x, curPathmakerPos.y] = Grid.FLOOR;
+            Camera.main.transform.Translate(0, 0, -0.75f * (1f - (floors / maxFloorCount)) / 2);
 
-            Camera.main.transform.Translate(0, 0, -0.75f * (1f - (floors.Count / maxFloorCount)) / 2);
-
+            /*
             int a = Random.Range(0, floorGenudioSources.Count);
             AudioSource curFloorAudioSource = floorGenudioSources[a];
             curFloorAudioSource.Play();
+            */
         }
     }
 
@@ -471,7 +493,7 @@ public class Pathmaker : MonoBehaviour
     void PathmakerUpdate(int i, int numOfPathObject) // Dictates the Pathmaker to moveforward
     {
         // Local variables
-        float moveDistance = 5.0f;
+        int moveDistance = movementDistance;
 
         int updatedPathmakerCount = numOfPathObject;
 
@@ -616,7 +638,7 @@ public class Pathmaker : MonoBehaviour
         int maxHeight = maxFloorCount;
 
         // Scanner Walk Distance
-        int moveDistance = 5;
+        int moveDistance = movementDistance;
 
         // Boolean used for the entire action sequence
 
@@ -777,125 +799,48 @@ public class Pathmaker : MonoBehaviour
     // This is where Walls are created
     IEnumerator CreateWall()
     {
-        if (stage1Text.activeInHierarchy == true && stage2Text != null)
+        for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
         {
-            stage1Text.SetActive(false);
-            stage2Text.SetActive(true);
-        }
-
-        // Finalize max floor count to use as max height
-        int maxHeight = maxFloorCount;
-
-        // Scanner Walk Distance
-        int moveDistance = 5;
-
-        // Boolean used for the entire actio+n sequence
-
-        List<GameObject> prefabScannerList = new List<GameObject>();
-        
-        // spawn Scanner Object Group
-        GameObject prefabScannerGroup = Instantiate(scannerPrefabObject, this.transform.position, Quaternion.Euler(0, 0, 0));
-
-        // It will first climb up from top to bottom of level gen on the Y axis
-
-        // Spawns prefab Scanner Objects that also serves as the medium for where the scanner "moves" by Raycasting
-
-        // Once their purposes are done, remove all prefab Scanner Objects.
-
-        for (int i = maxHeight * moveDistance; i >= -maxHeight * moveDistance; i -= moveDistance)
-        {
-            int curheight = i;
-
-            // Initial spawn position
-            Vector3 spawnPos = new Vector3(-maxHeight * moveDistance, curheight, 0);
-
-            // Determining radius
-            float r = Vector3.Distance(prefabScannerGroup.transform.position, spawnPos);
-
-            // Set up new Vector3 value as true spawn value
-            Vector3 trueSpawnPos = new Vector3();
-
-            float Rotation = prefabScannerGroup.transform.eulerAngles.y * Mathf.Deg2Rad;
-
-            trueSpawnPos.x = r * Mathf.Cos(Rotation);
-
-            trueSpawnPos.y = r * Mathf.Sin(Rotation);
-
-            trueSpawnPos.z = 0;
-
-
-            // spawn Scanner Object
-            GameObject prefabScanner = Instantiate(scannerPrefabObject, trueSpawnPos, Quaternion.Euler(0, 0, 0), prefabScannerGroup.transform);
-            prefabScannerList.Add(prefabScanner);
-
-            Vector3 rightscan = prefabScanner.transform.TransformDirection(Vector3.right);
-
-            // list of floor collision the raycast hit
-            RaycastHit[] floorHits;
-
-            floorHits = Physics.RaycastAll(spawnPos, rightscan, maxHeight * moveDistance * 2, floorLayerMask);
-
-            for (int j = 0; j < floorHits.Length; j++)
+            for (int y = 0; y < gridHandler.GetLength(1) - 1; y++)
             {
-                RaycastHit curFloorHit = floorHits[j];
-
-                // Collect current floor Object amongst the list of objects hit by raycast
-                GameObject curFloor = curFloorHit.transform.gameObject;
-
-                Transform curTransform = this.transform;
-
-                Vector3 curFloorPos = curFloor.transform.position;
-
-                LayerMask floorAndWall = floorAndWallLayerMask;
-
-                GameObject wallPrefab = wallPrefabObject;
-
-                Vector3 right = curFloor.transform.TransformDirection(Vector3.right);
-
-                Vector3 left = curFloor.transform.TransformDirection(Vector3.left);
-
-                Vector3 up = curFloor.transform.TransformDirection(Vector3.up);
-
-                Vector3 down = curFloor.transform.TransformDirection(Vector3.down);
-
-                int distance = 5;
-
-                Quaternion rightRotation = Quaternion.Euler(0, 0, -90);
-
-                Quaternion leftRotation = Quaternion.Euler(0, 0, 90);
-
-                Quaternion upRotation = Quaternion.Euler(0, 0, 0);
-
-                Quaternion downRotation = Quaternion.Euler(0, 0, 180);
-
-                List<AudioSource> wallAudioSourceList = wallGenSoundList;
-
-                WallSpawner(wallPrefab, curFloor, curFloorPos, right, rightRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
-
-                WallSpawner(wallPrefab, curFloor, curFloorPos, left, leftRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
-
-                WallSpawner(wallPrefab, curFloor, curFloorPos, up, upRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
-
-                WallSpawner(wallPrefab, curFloor, curFloorPos, down, downRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
-
-                yield return j;
-            }
-            if (i <= -maxHeight * moveDistance)
-            {
-                Debug.Log("Wall Construction Completed");
-                CameraMovement = true;
-
-                if (stage2Text.activeInHierarchy == true && stage3Text != null)
+                if (gridHandler[x, y] == Grid.FLOOR)
                 {
-                    stage2Text.SetActive(false);
-                    stage3Text.SetActive(true);
-                }
-                if (genCompletedSound != null)
-                {
-                    genCompletedSound.Play();
+                    bool hasCreatedWall = false;
+
+                    //Don't generate collision wall if there are diagonal corner calculated
+                    if (gridHandler[x + 1, y] == Grid.EMPTY)
+                    {
+                        wallDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x + 1, y, 0), floorDualGridTilemap.DataTile);
+                        gridHandler[x + 1, y] = Grid.WALL;
+                        hasCreatedWall = true;
+                    }
+                    if (gridHandler[x - 1, y] == Grid.EMPTY)
+                    {
+                        wallDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x - 1, y, 0), floorDualGridTilemap.DataTile);
+                        gridHandler[x - 1, y] = Grid.WALL;
+                        hasCreatedWall = true;
+                    }
+                    if (gridHandler[x, y + 1] == Grid.EMPTY)
+                    {
+                        wallDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y + 1, 0), floorDualGridTilemap.DataTile);
+                        gridHandler[x, y + 1] = Grid.WALL;
+                        hasCreatedWall = true;
+                    }
+                    if (gridHandler[x, y - 1] == Grid.EMPTY)
+                    {
+                        wallDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y - 1, 0), floorDualGridTilemap.DataTile);
+                        gridHandler[x, y - 1] = Grid.WALL;
+                        hasCreatedWall = true;
+                    }
+
+                    if (hasCreatedWall)
+                    {
+                        yield return new WaitForSeconds(waitTime);
+                    }
                 }
             }
         }
+
         /*
         while (prefabScannerList.Count > 0)
         {
@@ -903,7 +848,6 @@ public class Pathmaker : MonoBehaviour
         }
         Destroy(prefabScannerGroup);
         */
-        StartCoroutine(LevelSizeScanner());
     }
 
     static void WallSpawner(GameObject wallPrefab, GameObject curFloor, Vector3 curFloorPos, Vector3 direction, Quaternion rotation, float distance, LayerMask floorAndWall, Transform thisTransform, List<AudioSource> wallAudioSourceList)
