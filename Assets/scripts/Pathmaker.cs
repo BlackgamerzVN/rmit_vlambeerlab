@@ -26,7 +26,7 @@ public class Pathmaker : MonoBehaviour
     //	Declare a private integer called counter that starts at 0; 		// counter will track how many floor tiles I've instantiated
     [Header("The value we got from input field")]
 
-    public int maxFloorCount;
+    static public int maxFloorCount;
 
     public int chanceToChange;
 
@@ -624,6 +624,9 @@ public class Pathmaker : MonoBehaviour
 
         List<GameObject> prefabScannerList = new List<GameObject>();
 
+        // spawn Scanner Object Group
+        GameObject prefabScannerGroup = Instantiate(scannerPrefabObject, this.transform.position, Quaternion.Euler(0, 0, 0));
+
         // It will first climb up from top to bottom of level gen on the Y axis
 
         // Spawns prefab Scanner Objects that also serves as the medium for where the scanner "moves" by Raycasting
@@ -639,15 +642,15 @@ public class Pathmaker : MonoBehaviour
             Vector3 spawnPos = new Vector3(-maxHeight * moveDistance, curheight, 0);
 
             // spawn Scanner Object
-            GameObject prefabScanner = Instantiate(scannerPrefabObject, spawnPos, Quaternion.Euler(0, 0, 0));
+            GameObject prefabScanner = Instantiate(scannerPrefabObject, spawnPos, Quaternion.Euler(0, 0, 0), prefabScannerGroup.transform);
             prefabScannerList.Add(prefabScanner);
 
-            Vector3 right = prefabScanner.transform.TransformDirection(Vector3.right);
+            Vector3 rightscan = prefabScanner.transform.TransformDirection(Vector3.right);
 
             // list of floor collision the raycast hit
             RaycastHit[] floorHits;
 
-            floorHits = Physics.RaycastAll(spawnPos, right, maxHeight * moveDistance, floorLayerMask);
+            floorHits = Physics.RaycastAll(spawnPos, rightscan, maxHeight * moveDistance * 2, floorLayerMask);
 
             for (int j = 0; j < floorHits.Length; j++)
             {
@@ -674,6 +677,21 @@ public class Pathmaker : MonoBehaviour
                     Debug.Log("Spanwed Player");
                 }
             }
+        }
+        while (prefabScannerList.Count > 0)
+        {
+            PrefabScannerTermination(prefabScannerList);
+        }
+        Destroy(prefabScannerGroup);
+    }
+
+    void PrefabScannerTermination(List<GameObject> prefabScannerList)
+    {
+        for (int i = 0; i < prefabScannerList.Count; i++)
+        {
+            GameObject curPrefabScanner = prefabScannerList[i];
+            Destroy(curPrefabScanner);
+            prefabScannerList.RemoveAt(i);
         }
     }
 
@@ -765,42 +783,93 @@ public class Pathmaker : MonoBehaviour
             stage2Text.SetActive(true);
         }
 
-        for (int i = 0; i < floors.Count; ++i)
+        // Finalize max floor count to use as max height
+        int maxHeight = maxFloorCount;
+
+        // Scanner Walk Distance
+        int moveDistance = 5;
+
+        // Boolean used for the entire actio+n sequence
+
+        List<GameObject> prefabScannerList = new List<GameObject>();
+        
+        // spawn Scanner Object Group
+        GameObject prefabScannerGroup = Instantiate(scannerPrefabObject, this.transform.position, Quaternion.Euler(0, 0, 0));
+
+        // It will first climb up from top to bottom of level gen on the Y axis
+
+        // Spawns prefab Scanner Objects that also serves as the medium for where the scanner "moves" by Raycasting
+
+        // Once their purposes are done, remove all prefab Scanner Objects.
+
+        for (int i = maxHeight * moveDistance; i >= -maxHeight * moveDistance; i -= moveDistance)
         {
-            bool createdWall = false;
+            int curheight = i;
 
-            Transform curTransform = this.transform;
+            // Initial spawn position
+            Vector3 spawnPos = new Vector3(-maxHeight * moveDistance, curheight, 0);
 
-            GameObject curFloor = floors[i];
+            // Determining radius
+            float r = Vector3.Distance(prefabScannerGroup.transform.position, spawnPos);
 
-            Vector3 curFloorPos = curFloor.transform.position;
+            // Set up new Vector3 value as true spawn value
+            Vector3 trueSpawnPos = new Vector3();
 
-            LayerMask floorAndWall = floorAndWallLayerMask;
+            float Rotation = prefabScannerGroup.transform.eulerAngles.y * Mathf.Deg2Rad;
 
-            GameObject wallPrefab = wallPrefabObject;
+            trueSpawnPos.x = r * Mathf.Cos(Rotation);
 
-            Vector3 right = curFloor.transform.TransformDirection(Vector3.right);
+            trueSpawnPos.y = r * Mathf.Sin(Rotation);
 
-            Vector3 left = curFloor.transform.TransformDirection(Vector3.left);
+            trueSpawnPos.z = 0;
 
-            Vector3 up = curFloor.transform.TransformDirection(Vector3.up);
 
-            Vector3 down = curFloor.transform.TransformDirection(Vector3.down);
+            // spawn Scanner Object
+            GameObject prefabScanner = Instantiate(scannerPrefabObject, trueSpawnPos, Quaternion.Euler(0, 0, 0), prefabScannerGroup.transform);
+            prefabScannerList.Add(prefabScanner);
 
-            int distance = 5;
+            Vector3 rightscan = prefabScanner.transform.TransformDirection(Vector3.right);
 
-            Quaternion rightRotation = Quaternion.Euler(0, 0, -90);
+            // list of floor collision the raycast hit
+            RaycastHit[] floorHits;
 
-            Quaternion leftRotation = Quaternion.Euler(0, 0,  90);
+            floorHits = Physics.RaycastAll(spawnPos, rightscan, maxHeight * moveDistance * 2, floorLayerMask);
 
-            Quaternion upRotation = Quaternion.Euler(0, 0, 0);
-
-            Quaternion downRotation = Quaternion.Euler(0, 0, 180);
-
-            List<AudioSource> wallAudioSourceList = wallGenSoundList;
-
-            if (createdWall == false)
+            for (int j = 0; j < floorHits.Length; j++)
             {
+                RaycastHit curFloorHit = floorHits[j];
+
+                // Collect current floor Object amongst the list of objects hit by raycast
+                GameObject curFloor = curFloorHit.transform.gameObject;
+
+                Transform curTransform = this.transform;
+
+                Vector3 curFloorPos = curFloor.transform.position;
+
+                LayerMask floorAndWall = floorAndWallLayerMask;
+
+                GameObject wallPrefab = wallPrefabObject;
+
+                Vector3 right = curFloor.transform.TransformDirection(Vector3.right);
+
+                Vector3 left = curFloor.transform.TransformDirection(Vector3.left);
+
+                Vector3 up = curFloor.transform.TransformDirection(Vector3.up);
+
+                Vector3 down = curFloor.transform.TransformDirection(Vector3.down);
+
+                int distance = 5;
+
+                Quaternion rightRotation = Quaternion.Euler(0, 0, -90);
+
+                Quaternion leftRotation = Quaternion.Euler(0, 0, 90);
+
+                Quaternion upRotation = Quaternion.Euler(0, 0, 0);
+
+                Quaternion downRotation = Quaternion.Euler(0, 0, 180);
+
+                List<AudioSource> wallAudioSourceList = wallGenSoundList;
+
                 WallSpawner(wallPrefab, curFloor, curFloorPos, right, rightRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
 
                 WallSpawner(wallPrefab, curFloor, curFloorPos, left, leftRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
@@ -809,15 +878,9 @@ public class Pathmaker : MonoBehaviour
 
                 WallSpawner(wallPrefab, curFloor, curFloorPos, down, downRotation, distance, floorAndWall, curTransform, wallAudioSourceList);
 
-                createdWall = true;
+                yield return j;
             }
-
-            if (createdWall == true)
-            {
-                yield return new WaitForSeconds(waitTime);
-            }
-
-            if (i == (floors.Count - 1))
+            if (i <= -maxHeight * moveDistance)
             {
                 Debug.Log("Wall Construction Completed");
                 CameraMovement = true;
@@ -833,7 +896,13 @@ public class Pathmaker : MonoBehaviour
                 }
             }
         }
-
+        /*
+        while (prefabScannerList.Count > 0)
+        {
+            PrefabScannerTermination(prefabScannerList);
+        }
+        Destroy(prefabScannerGroup);
+        */
         StartCoroutine(LevelSizeScanner());
     }
 
