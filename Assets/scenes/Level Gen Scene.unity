@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _renderTile: {fileID: 11400000, guid: 67d87ff76fb4e2a4283f368107225447, type: 2}
   _enableTilemapCollider: 0
-  _gameObjectOrigin: 0
+  _gameObjectOrigin: 1
 --- !u!1839735485 &134829843
 Tilemap:
   m_ObjectHideFlags: 0
@@ -201,8 +201,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 134829841}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -266,6 +266,7 @@ GameObject:
   - component: {fileID: 1043624298}
   - component: {fileID: 1043624300}
   - component: {fileID: 1043624299}
+  - component: {fileID: 1043624301}
   m_Layer: 0
   m_Name: RenderTilemap
   m_TagString: Untagged
@@ -375,6 +376,42 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!19719996 &1043624301
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043624297}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_MaximumTileChangeCount: 1000
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1 &1120575995
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,22 +458,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chanceToChange: 75
   floors: 0
-  floorLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  wallLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  floorAndWallLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
   scannerPrefabObject: {fileID: 3430240354374809636, guid: 7b13de9d6e37d714881b72142dc830d7,
     type: 3}
-  playerPrefabObject: {fileID: 0}
+  playerPrefabObject: {fileID: 6547699564535290312, guid: 3183f278596041d439d8f139a1131d90,
+    type: 3}
   PathObjects: []
   pathmakerLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   pathmakerSpherePrefabObject: {fileID: 2814506858530636336, guid: 10abe981bb379e844950b147a8e74a51,
     type: 3}
   waitTime: 0.01
@@ -448,20 +477,7 @@ MonoBehaviour:
   stage1Text: {fileID: 0}
   stage2Text: {fileID: 0}
   stage3Text: {fileID: 0}
-  inputSound: {fileID: 0}
-  buttonSound: {fileID: 0}
-  genCompletedSound: {fileID: 0}
-  floorGenSoundList: []
-  wallGenSoundList: []
   CameraMovementSpeed: 100
-  UpKey: 119
-  DownKey: 115
-  LeftKey: 97
-  RightKey: 100
-  AltUpKey: 273
-  AltDownKey: 274
-  AltLeftKey: 276
-  AltRightKey: 275
   floorDualGridTilemap: {fileID: 2011989450}
   wallDualGridTilemap: {fileID: 134829842}
 --- !u!1 &1614686136
@@ -763,7 +779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _renderTile: {fileID: 11400000, guid: 4564e67b921a97f4eb04d9cf8b64174c, type: 2}
-  _enableTilemapCollider: 0
+  _enableTilemapCollider: 1
   _gameObjectOrigin: 0
 --- !u!1 &2122445662
 GameObject:
@@ -800,7 +816,7 @@ Camera:
   m_GameObject: {fileID: 2122445662}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -851,7 +867,7 @@ Transform:
   m_GameObject: {fileID: 2122445662}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 321.7, y: 1, z: -180.6}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
