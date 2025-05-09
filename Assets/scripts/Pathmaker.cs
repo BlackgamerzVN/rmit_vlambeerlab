@@ -42,8 +42,6 @@ public class Pathmaker : MonoBehaviour
 
     //	Declare a public Transform called pathmakerSpherePrefab, assign the prefab in inspector; 		// you'll have to make a "pathmakerSphere" prefab later
 
-    public GameObject scannerPrefabObject;
-
     public GameObject playerPrefabObject;
 
     [Header("Pathmaker Prefab Properties")]
@@ -393,7 +391,7 @@ public class Pathmaker : MonoBehaviour
 
         GameObject curPathmaker = PathObjects[i];
         Vector3Int curPathmakerPos = Vector3Int.FloorToInt(curPathmaker.transform.position);
-        floorDualGridTilemap.DataTilemap.SetTile(Vector3Int.FloorToInt(curPathmakerPos), floorDualGridTilemap.DataTile);
+        floorDualGridTilemap.DataTilemap.SetTile(curPathmakerPos, floorDualGridTilemap.DataTile);
         gridHandler[curPathmakerPos.x, curPathmakerPos.y] = Grid.FLOOR;
         Camera.main.transform.Translate(0, 0, -0.05f * (1f - (floors / maxFloorCount)) / 2);
 
@@ -612,18 +610,21 @@ public class Pathmaker : MonoBehaviour
                     }
                 }
             }
-
-            Vector3 cameraPointToMove = new Vector3
+            if (cameraAllowedToMove == false)
+            {
+                Vector3 cameraPointToMove = new Vector3
                 (
                 (minX + maxX) / 2f,
                 (minY + maxY) / 2f,
                 Camera.main.transform.position.z
                 );
-            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, cameraPointToMove, CameraMovementSpeed / Time.fixedDeltaTime);
-
-            yield return null;
+                Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, cameraPointToMove, CameraMovementSpeed / Time.fixedDeltaTime);
+            }
+            yield return new WaitForSeconds(waitTime);
         }
     }
+
+    bool cameraAllowedToMove = false;
 
     // BETTER UI:
     // learn how to use UI Sliders (https://unity3d.com/learn/tutorials/topics/user-interface-ui/ui-slider) 
@@ -675,8 +676,89 @@ public class Pathmaker : MonoBehaviour
 
     public void ExitGame()
     {
-       
         Application.Quit();
+    }
+
+    static float playerXPos;
+
+    static float playerYPos;
+
+    public void DestructiveTile(float a, float b, int r)
+    {
+        playerXPos = a;
+
+        playerYPos = b;
+
+        int curX = Mathf.FloorToInt(playerXPos);
+
+        // Minus one to make sure this only happens below the player
+        int curY = Mathf.FloorToInt(playerYPos) - 1;
+
+        // First clear all wall tiles and fill empty files within the radius
+        for (int y = curY + r; y >= curY - r; y--)
+        {
+            for (int x = curX - r; x <= curX + r; x++)
+            {
+                if (x >= 0 && x < gridHandler.GetLength(0) && y >= 0 && y < gridHandler.GetLength(1))
+                {
+                    FloorGenerator(x, y);
+                }
+            }
+        }
+        // Once done refill the outer with wall tiles
+        for (int y = curY + r; y >= curY - r; y--)
+        {
+            for (int x = curX - r; x <= curX + r; x++)
+            {
+                if (gridHandler[x, y] == Grid.FLOOR)
+                {
+                    // Generate Walls if there are adjustant tiles
+
+                    // boolean is now executed within itself OR the defined bool
+
+                    WallGenerator(x + 1, y);
+                    WallGenerator(x - 1, y);
+                    WallGenerator(x, y + 1);
+                    WallGenerator(x, y - 1);
+                    WallGenerator(x + 1, y - 1);
+                    WallGenerator(x - 1, y - 1);
+                    WallGenerator(x + 1, y + 1);
+                    WallGenerator(x - 1, y + 1);
+                }
+            }
+        }
+    }
+
+    public void FloorTilePlacement(Vector3Int tilePos)
+    {
+        if (gridHandler[tilePos.x, tilePos.y] == Grid.FLOOR)
+        {
+            wallDualGridTilemap.DataTilemap.SetTile(tilePos, wallDualGridTilemap.DataTile);
+            floorDualGridTilemap.DataTilemap.SetTile(tilePos, null);
+            gridHandler[tilePos.x, tilePos.y] = Grid.WALL;
+        }
+    }
+    
+    public void WallTilePlacement(Vector3Int tilePos)
+    {
+        if (gridHandler[tilePos.x, tilePos.y] == Grid.WALL)
+        {
+            wallDualGridTilemap.DataTilemap.SetTile(tilePos, null);
+            floorDualGridTilemap.DataTilemap.SetTile(tilePos, floorDualGridTilemap.DataTile);
+            gridHandler[tilePos.x, tilePos.y] = Grid.WALL;
+
+            int x = tilePos.x;
+            int y = tilePos.y;
+
+            WallGenerator(x + 1, y);
+            WallGenerator(x - 1, y);
+            WallGenerator(x, y + 1);
+            WallGenerator(x, y - 1);
+            WallGenerator(x + 1, y - 1);
+            WallGenerator(x - 1, y - 1);
+            WallGenerator(x + 1, y + 1);
+            WallGenerator(x - 1, y + 1);
+        }
     }
 
     // WALL GENERATION
@@ -689,7 +771,7 @@ public class Pathmaker : MonoBehaviour
     // This is where Walls are created
     IEnumerator CreateWall()
     {
-        StopCoroutine(LevelSizeScanner());
+        cameraAllowedToMove = true;
         for (int y = gridHandler.GetLength(1) - 1; y > 0; y--)
         {
             for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
@@ -727,12 +809,40 @@ public class Pathmaker : MonoBehaviour
     {
         if (gridHandler[x, y] == Grid.EMPTY)
         {
-            wallDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), floorDualGridTilemap.DataTile);
+            wallDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), wallDualGridTilemap.DataTile);
             gridHandler[x, y] = Grid.WALL;
             return true;
         }
         return false;
     }
+
+    bool FloorGenerator(int x, int y)
+    {
+        if (gridHandler[x, y] == Grid.EMPTY)
+        {
+            // Set floor tile in current position
+            floorDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), floorDualGridTilemap.DataTile);
+            // Redesignate this tile as FLOOR tile
+            gridHandler[x, y] = Grid.FLOOR;
+            // calls true
+            return true;
+        }
+        if (gridHandler[x, y] == Grid.WALL)
+        {
+
+            // Clear wall tile in current position
+            wallDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), null);
+            // Set floor tile in current position
+            floorDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), floorDualGridTilemap.DataTile);
+            // Redesignate this tile as FLOOR tile
+            gridHandler[x, y] = Grid.FLOOR;
+            // calls true
+            return true;
+        }
+        return false;
+    }
+
+    public GameObject CursorControllerObject;
 
     IEnumerator PlayerSpawner()
     {
@@ -759,6 +869,7 @@ public class Pathmaker : MonoBehaviour
                 }
             }
         }
+        CursorControllerObject.SetActive(true);
     }
 
     bool FloorCheck(int x, int y)
@@ -803,7 +914,7 @@ public class Pathmaker : MonoBehaviour
             Camera.main.transform.position.z
             );
 
-            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, cameraPointToMove, CameraMovementSpeed);
+            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, cameraPointToMove, CameraMovementSpeed / 5 * Time.deltaTime);
 
             yield return null;
         }

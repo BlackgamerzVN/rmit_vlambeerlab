@@ -1,14 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\",
+  "WorkspaceRootPath": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\admin\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\pathmaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\s4043089\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\pathmaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pathmaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\admin\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\cursor controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\cursor controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cursor controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\character movement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\character movement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,32 +22,43 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "Cursor Controller.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Cursor Controller.cs",
+              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Cursor Controller.cs",
               "RelativeDocumentMoniker": "Assets\\scripts\\Cursor Controller.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Cursor Controller.cs",
+              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Cursor Controller.cs",
               "RelativeToolTip": "Assets\\scripts\\Cursor Controller.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-08T15:29:42.059Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-09T07:43:32.155Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Character Movement.cs",
+              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Character Movement.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\Character Movement.cs",
+              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Character Movement.cs",
+              "RelativeToolTip": "Assets\\scripts\\Character Movement.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEwAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-09T03:07:14.786Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Pathmaker.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
+              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
               "RelativeDocumentMoniker": "Assets\\scripts\\Pathmaker.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
+              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
               "RelativeToolTip": "Assets\\scripts\\Pathmaker.cs",
-              "ViewState": "AgIAAAACAAAAAAAAAAAswJQBAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAAoDAAAAAAAAAAAkwFEDAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-07T01:19:53.825Z",
+              "WhenOpened": "2025-05-09T02:34:58.244Z",
               "EditorCaption": ""
             }
           ]

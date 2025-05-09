@@ -39,14 +39,42 @@ public class CharacterMovement : MonoBehaviour
         }
         if (Physics.Raycast(rb.position, Vector3.down, 1f, wall) && isSlammingDown == true)
         {
+            // Calls back checkes to default value
+
             isSlammingDown = false;
             isMoving = true;
             Debug.Log("Slammed!");
+
+            Vector3 playerPos = rb.position;
+
+            SlamProperties(playerPos);
+
+            // Knockback force to make sure player object does not penetrate the floor
+
             if (rb.velocity.y > -150)
             {
                 rb.AddForce(Vector3.up * moveSpeed * 450);
             }
         }
+    }
+
+    static Pathmaker pathmaker;
+
+    private void Start()
+    {
+        GameObject pathmakerObject = GameObject.FindGameObjectWithTag("Pathmaker");
+
+        pathmaker = pathmakerObject.GetComponent<Pathmaker>();
+    }
+    static void SlamProperties(Vector3 playerPos)
+    {
+        float x = playerPos.x;
+
+        float y = playerPos.y;
+
+        int r = 1;
+
+        pathmaker.DestructiveTile(x, y, r);
     }
 
     void FixedUpdate()
