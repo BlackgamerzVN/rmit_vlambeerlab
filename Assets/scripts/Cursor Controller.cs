@@ -11,11 +11,11 @@ public class CursorController : MonoBehaviour
     {
         Vector3 mousePos;
         mousePos = Input.mousePosition;
-        Debug.Log("C1: " + mousePos.ToString());
-        mousePos.z = 10;
+        //Debug.Log("C1: " + mousePos.ToString());
+        //mousePos.z = 10;
 
         mousePos = Camera.main.ScreenToWorldPoint(mousePos);
-        Debug.Log("C2: " + mousePos.ToString());
+        //Debug.Log("C2: " + mousePos.ToString());
 
         Vector3Int tilePos = GetWorldPosTile(mousePos);
         transform.position = tilePos + new Vector3(0.5f, 0.5f, Camera.main.ScreenToWorldPoint(Input.mousePosition).z);
@@ -24,11 +24,11 @@ public class CursorController : MonoBehaviour
 
         pathmaker = pathmakerObject.GetComponent<Pathmaker>();
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             pathmaker.FloorTilePlacement(tilePos);
         }
-        if (Input.GetMouseButton(1))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             pathmaker.WallTilePlacement(tilePos);
         }

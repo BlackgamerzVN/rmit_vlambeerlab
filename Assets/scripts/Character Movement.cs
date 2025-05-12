@@ -6,11 +6,11 @@ public class CharacterMovement : MonoBehaviour
 {
     public float moveSpeed = 10.0f;
 
-    public Rigidbody rb;
+    public Rigidbody2D rb;
 
     public LayerMask wall;
 
-    Vector3 movement;
+    Vector2 movement;
 
     bool isMoving = true;
 
@@ -21,11 +21,11 @@ public class CharacterMovement : MonoBehaviour
     {
 
         movement.x = Input.GetAxisRaw("Horizontal");
-        if (Physics.Raycast(rb.position, Vector3.down, 1f, wall))
+        if (Physics.Raycast(rb.position, Vector2.down, 1f, wall))
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                rb.AddForce(Vector3.up * moveSpeed * 100);
+                rb.AddForce(Vector2.up * moveSpeed * 100);
             }
         }
         if (rb.velocity.y != 0)
@@ -37,7 +37,7 @@ public class CharacterMovement : MonoBehaviour
                 isMoving = false;
             }
         }
-        if (Physics.Raycast(rb.position, Vector3.down, 1f, wall) && isSlammingDown == true)
+        if (Physics.Raycast(rb.position, Vector2.down, 1f, wall) && isSlammingDown == true)
         {
             // Calls back checkes to default value
 
@@ -45,7 +45,7 @@ public class CharacterMovement : MonoBehaviour
             isMoving = true;
             Debug.Log("Slammed!");
 
-            Vector3 playerPos = rb.position;
+            Vector2 playerPos = rb.position;
 
             SlamProperties(playerPos);
 
@@ -53,7 +53,7 @@ public class CharacterMovement : MonoBehaviour
 
             if (rb.velocity.y > -150)
             {
-                rb.AddForce(Vector3.up * moveSpeed * 450);
+                rb.AddForce(Vector2.up * moveSpeed * 450);
             }
         }
     }
@@ -65,8 +65,13 @@ public class CharacterMovement : MonoBehaviour
         GameObject pathmakerObject = GameObject.FindGameObjectWithTag("Pathmaker");
 
         pathmaker = pathmakerObject.GetComponent<Pathmaker>();
+
+        rb = GetComponent<Rigidbody2D>();
+
+        
     }
-    static void SlamProperties(Vector3 playerPos)
+
+    static void SlamProperties(Vector2 playerPos)
     {
         float x = playerPos.x;
 

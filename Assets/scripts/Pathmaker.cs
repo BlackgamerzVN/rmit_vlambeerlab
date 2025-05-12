@@ -731,7 +731,7 @@ public class Pathmaker : MonoBehaviour
 
     public void FloorTilePlacement(Vector3Int tilePos)
     {
-        if (gridHandler[tilePos.x, tilePos.y] == Grid.FLOOR)
+        if (gridHandler[tilePos.x, tilePos.y] == Grid.FLOOR && gridHandler[tilePos.x, tilePos.y + 1] == Grid.FLOOR && gridHandler[tilePos.x, tilePos.y + 2] == Grid.FLOOR)
         {
             wallDualGridTilemap.DataTilemap.SetTile(tilePos, wallDualGridTilemap.DataTile);
             floorDualGridTilemap.DataTilemap.SetTile(tilePos, null);
@@ -872,7 +872,7 @@ public class Pathmaker : MonoBehaviour
         CursorControllerObject.SetActive(true);
     }
 
-    bool FloorCheck(int x, int y)
+    public bool FloorCheck(int x, int y)
     {
         if (gridHandler[x, y] == Grid.FLOOR)
         {
@@ -914,7 +914,7 @@ public class Pathmaker : MonoBehaviour
             Camera.main.transform.position.z
             );
 
-            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, cameraPointToMove, CameraMovementSpeed / 5 * Time.deltaTime);
+            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, cameraPointToMove, CameraMovementSpeed * Time.deltaTime);
 
             yield return null;
         }
