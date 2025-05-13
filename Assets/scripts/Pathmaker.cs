@@ -786,14 +786,19 @@ public class Pathmaker : MonoBehaviour
 
                     // Once the variable is set as true in any circumtance, it will always default to true unless stated otherwise or moving to other vector, thus allowing continuous loop of wall gen,
 
-                    hasCreatedWall |= WallGenerator(x + 1, y);
-                    hasCreatedWall |= WallGenerator(x - 1, y);
-                    hasCreatedWall |= WallGenerator(x, y + 1);
-                    hasCreatedWall |= WallGenerator(x, y - 1);
-                    hasCreatedWall |= WallGenerator(x + 1, y - 1);
-                    hasCreatedWall |= WallGenerator(x - 1, y - 1);
-                    hasCreatedWall |= WallGenerator(x + 1, y + 1);
-                    hasCreatedWall |= WallGenerator(x - 1, y + 1);
+                    int iteration = 1;
+
+                    for (int z = 1; z <= iteration; z++)
+                    {
+                        hasCreatedWall |= WallGenerator(x + z, y);
+                        hasCreatedWall |= WallGenerator(x - z, y);
+                        hasCreatedWall |= WallGenerator(x, y + z);
+                        hasCreatedWall |= WallGenerator(x, y - z);
+                        hasCreatedWall |= WallGenerator(x + z, y - z);
+                        hasCreatedWall |= WallGenerator(x - z, y - z);
+                        hasCreatedWall |= WallGenerator(x + z, y + z);
+                        hasCreatedWall |= WallGenerator(x - z, y + z);
+                    }
 
                     if (hasCreatedWall)
                     {

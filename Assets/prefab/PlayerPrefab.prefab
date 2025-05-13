@@ -329,14 +329,14 @@ MonoBehaviour:
   _minGroundNormalY: 0.65
   _gravityModifier: 1
   _dampingFactor: 1
-  _gravityForce: {x: 0, y: -2}
+  _gravityForce: {x: 0, y: -1}
   _numOfConstrantRuns: 50
   _collisionSegmentInterval: 2
   _grappleLength: 0
   _grappleLayer:
     serializedVersion: 2
     m_Bits: 0
-  _numOfRopeSegments: 10
+  _numOfRopeSegments: 20
   _ropeSegmentLength: 0.225
   _collisionMask:
     serializedVersion: 2

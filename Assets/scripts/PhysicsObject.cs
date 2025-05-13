@@ -15,10 +15,10 @@ public class PhysicsObject : MonoBehaviour
     protected Vector2 _velocity;
     protected ContactFilter2D _contactFilter;
     protected RaycastHit2D[] _hitBuffer = new RaycastHit2D[16];
-    protected List<RaycastHit2D> _hitBufferList = new List<RaycastHit2D>();
+    protected List<RaycastHit2D> _hitBufferList = new List<RaycastHit2D>(16);
 
     protected const float minMoveDistance = 0.001f;
-    protected const float shellRadius = 0.01f;
+    protected const float _shellRadius = 0.01f;
 
     private void OnEnable()
     {
@@ -83,20 +83,6 @@ public class PhysicsObject : MonoBehaviour
     }
     void FixedUpdate()
     {
-        // Checks if the object is under influence of gravity
-        ComputeGrapplingHookSimulate(_isGrounded);
-
-        for (int i = 0; i < _numOfConstrantRuns; i++)
-        {
-            ComputeGrapplingHookApplyConstraints();
-
-            // Checks if i is divisable by 0
-            if (i % _collisionSegmentInterval == 0)
-            {
-                ComputeGrapplingHookHandleCollision();
-            }
-        }
-
         // Provide final velocity and ultimately, location.
         _velocity += _gravityModifier * _gravityForce * Time.deltaTime;
         _velocity.x = _targetVelocity.x;
@@ -116,6 +102,20 @@ public class PhysicsObject : MonoBehaviour
         move = Vector2.up * deltaPosition.y;
 
         Movement(move, true);
+
+        // Checks if the object is under influence of gravity
+        ComputeGrapplingHookSimulate(_isGrounded);
+
+        for (int i = 0; i < _numOfConstrantRuns; i++)
+        {
+            ComputeGrapplingHookApplyConstraints();
+
+            // Checks if i is divisable by 0
+            if (i % _collisionSegmentInterval == 0)
+            {
+                ComputeGrapplingHookHandleCollision();
+            }
+        }
     }
 
     protected bool _isGrounded;
@@ -128,7 +128,7 @@ public class PhysicsObject : MonoBehaviour
 
         if (distance > minMoveDistance)
         {
-            int count = _rb2d.Cast(move, _contactFilter, _hitBuffer, distance + shellRadius);
+            int count = _rb2d.Cast(move, _contactFilter, _hitBuffer, distance + _shellRadius);
             _hitBufferList.Clear();
 
             for (int i = 0; i < count; i++)
@@ -154,16 +154,16 @@ public class PhysicsObject : MonoBehaviour
 
                 if (projection < 0)
                 {
-                    _velocity -= projection * currentNormal;
+                    _velocity = _velocity - projection * currentNormal;
                 }
 
-                float modifiedDistance = _hitBufferList[i].distance - shellRadius;
+                float modifiedDistance = _hitBufferList[i].distance - _shellRadius;
 
                 distance = modifiedDistance < distance ? modifiedDistance : distance;
             }
         }
 
-        _rb2d.position += move.normalized * distance;
+        _rb2d.position = _rb2d.position + move.normalized * distance;
 
     }
 }

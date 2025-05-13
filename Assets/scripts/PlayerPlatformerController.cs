@@ -44,7 +44,7 @@ public class PlayerPlatformerController : PhysicsObject
                     _velocity.y *= .5f;
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.S))
+            else if (Input.GetKeyDown(KeyCode.S) && _isGrounded == false)
             {
                 _velocity.y = -_jumpTakeOffSpeed * 2;
                 _isMoving=false;
