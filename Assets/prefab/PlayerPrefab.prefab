@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 3133081527051523000}
   - component: {fileID: 3797832645574949440}
   - component: {fileID: 227108290197099831}
-  - component: {fileID: -2092890953949402441}
   - component: {fileID: -5195757094403687061}
   - component: {fileID: 2997946086700916679}
   m_Layer: 0
@@ -57,7 +56,7 @@ MeshRenderer:
   m_GameObject: {fileID: 6547699564535290312}
   m_Enabled: 1
   m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
@@ -115,7 +114,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!70 &3133081527051523000
 CapsuleCollider2D:
@@ -190,26 +189,6 @@ MonoBehaviour:
   _collisionSegmentInterval: 50
   _maxSpeed: 7
   _jumpTakeOffSpeed: 21
---- !u!232 &-2092890953949402441
-DistanceJoint2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6547699564535290312}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_EnableCollision: 1
-  m_ConnectedRigidBody: {fileID: 0}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_BreakAction: 3
-  m_AutoConfigureConnectedAnchor: 0
-  m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0, y: 0}
-  m_AutoConfigureDistance: 1
-  m_Distance: 191.21533
-  m_MaxDistanceOnly: 1
 --- !u!120 &-5195757094403687061
 LineRenderer:
   serializedVersion: 2
@@ -336,11 +315,11 @@ MonoBehaviour:
   _grappleLayer:
     serializedVersion: 2
     m_Bits: 0
-  _numOfRopeSegments: 20
-  _ropeSegmentLength: 0.225
+  _numOfRopeSegments: 10
+  _ropeSegmentLength: 0.45
   _collisionMask:
     serializedVersion: 2
     m_Bits: 128
   _collisionRadius: 0.1
-  _bounceFactor: 0.1
+  _bounceFactor: 0
   _correctionClampAmount: 0

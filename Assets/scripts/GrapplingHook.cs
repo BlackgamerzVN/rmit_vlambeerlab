@@ -18,7 +18,7 @@ public class GrapplingHook : PhysicsObject
     // This is where Velvet Intergration logic primarily be
 
     [Header("Rope")]
-    [SerializeField] private int _numOfRopeSegments = 10; // KEEP NUM OF ROPE SEGMENTS LOW! IT KILLS PERFORMANCE!
+    [SerializeField] private int _numOfRopeSegments = 20;
     [SerializeField] private float _ropeSegmentLength = 0.225f;
 
     [Header("Local Rope Physic")]
@@ -63,28 +63,38 @@ public class GrapplingHook : PhysicsObject
             //Debug.Log("C2: " + mousePos.ToString());
 
             Vector2 dir = ((Vector2)mousePos - _rb2d.position).normalized;
+            float dist = ((Vector2)mousePos - _rb2d.position).magnitude;
             Debug.Log("Click Direction: " + dir);
 
-            // Only grapple if direction is sufficiently upward
-            if (dir.y < 0.5f && dir.y > 0)
+            // Only grapple if direction is upward
+            if (dir.y > 0)
             {
                 _isGrappling = true;
 
-                RaycastHit2D hit = Physics2D.Raycast(_rb2d.position, dir, Mathf.Infinity, _collisionMask);
+                //RaycastHit2D hit = Physics2D.Raycast(_rb2d.position, dir, Mathf.Infinity, _collisionMask);
 
-                _grapplePoint = new Vector3(hit.point.x, hit.point.y, 0);
-                Debug.Log("Grapple Point: " + _grapplePoint);
-
-                _lineRenderer.enabled = true;
-
-                // Attach the starting point to own gameObject
-                _ropeStartPoint = _grapplePoint;
-
-                for (int i = 0; i < _numOfRopeSegments; i++)
+                RaycastHit hit = new RaycastHit();
+                if(Physics.Raycast(_rb2d.position, dir, out hit, Mathf.Infinity, _collisionMask))
                 {
-                    _ropeStartPoint.z = -1;
-                    _ropeSegments.Add(new RopeSegment(_ropeStartPoint));
-                    _ropeStartPoint.y -= _ropeSegmentLength;
+                    Vector3 offset = new Vector3(minMoveDistance, -minMoveDistance, 0);
+
+                    _grapplePoint = new Vector3(hit.point.x, hit.point.y, 0);
+                    Debug.Log("Grapple Point: " + _grapplePoint);
+
+                    _lineRenderer.enabled = true;
+
+                    // Attach the grapple point to starting point 
+                    _ropeStartPoint = _grapplePoint;
+
+                    for (int i = 0; i < _numOfRopeSegments; i++)
+                    {
+                        _ropeStartPoint.z = -1;
+                        _ropeSegments.Add(new RopeSegment(_ropeStartPoint));
+
+                        _ropeStartPoint = Vector3.MoveTowards(_ropeStartPoint, _rb2d.position, _ropeSegmentLength);
+
+                        //_ropeStartPoint = Vector3.MoveTowards(_ropeStartPoint, _rb2d.position, dist / _ropeSegments.Count);
+                    }
                 }
             }
         }
@@ -160,10 +170,15 @@ public class GrapplingHook : PhysicsObject
                 Vector2 changeDir = (currentSeg.CurrentPosition - nextSeg.CurrentPosition).normalized;
                 Vector2 changeVector = changeDir * difference;
 
-                if (i != 0)
+                if (i != 0 && i != _numOfRopeSegments - 2)
                 {
                     currentSeg.CurrentPosition -= (changeVector * 0.5f);
                     nextSeg.CurrentPosition += (changeVector * 0.5f);
+                }
+                else if (i == _numOfRopeSegments - 2)
+                {
+                    nextSeg.CurrentPosition += changeVector;
+                    _rb2d.position = Vector2.MoveTowards(_rb2d.position, nextSeg.CurrentPosition, 0.5f);
                 }
                 else
                 {
@@ -188,17 +203,29 @@ public class GrapplingHook : PhysicsObject
 
                 // Compute
                 Vector2 velocity = segment.CurrentPosition - segment.OldPosition;
-                Collider2D[] colliders = new Collider2D[32]; // Limit it down to 16! Performance nukes when too many of those collides trying to compute!
+                int maxColliders = 32;
 
-                colliders = Physics2D.OverlapCircleAll(segment.CurrentPosition, _collisionRadius, _collisionMask);
+                Collider[] hitColliders = new Collider[maxColliders];
 
-                foreach (Collider2D collider in colliders)
+                int numOfColliders = Physics.OverlapSphereNonAlloc(segment.CurrentPosition, _collisionRadius * i, hitColliders, _collisionMask);
+
+                // This must not be used with Duel Grid Tile collision!
+
+                // Performance nuke if tied with 2D Collision Polygon provided by Duel Grid Tile. Consider attaching conventional 3D object to the grid system and collide with them instead!
+
+                //Collider2D[] colliders = new Collider2D[maxColliders];
+
+                //colliders = Physics2D.OverlapCircleAll(segment.CurrentPosition, _collisionRadius, _collisionMask);
+
+                //foreach (Collider2D collider in colliders)
+                for(int k = 0; k < numOfColliders; k++)
                 {
+                    Collider collider = hitColliders[k];
                     Vector2 closestPoint = collider.ClosestPoint(segment.CurrentPosition);
                     float distance = Vector2.Distance(segment.CurrentPosition, closestPoint);
 
                     // if within the collision radius
-                    if (distance < _collisionRadius)
+                    if (distance < _collisionRadius * i)
                     {
                         Vector2 normal = (segment.CurrentPosition - closestPoint).normalized;
                         if (normal == Vector2.zero)
@@ -206,7 +233,7 @@ public class GrapplingHook : PhysicsObject
                             // fallback method
                             normal = (segment.CurrentPosition - (Vector2)collider.transform.position).normalized;
 
-                            float depth = _collisionRadius - distance;
+                            float depth = _collisionRadius * i - distance;
                             segment.CurrentPosition += normal * depth;
 
                             velocity = Vector2.Reflect(velocity, normal) * _bounceFactor;
