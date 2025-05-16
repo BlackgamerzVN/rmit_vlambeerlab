@@ -133,8 +133,9 @@ GameObject:
   - component: {fileID: 134829844}
   - component: {fileID: 134829843}
   - component: {fileID: 134829842}
+  - component: {fileID: 134829845}
   m_Layer: 7
-  m_Name: DataTilemap (1)
+  m_Name: Wall Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b152cdadb37e7464081d2bb9b6e8bc65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderTile: {fileID: 11400000, guid: 67d87ff76fb4e2a4283f368107225447, type: 2}
+  _renderTile: {fileID: 11400000, guid: f6ace180a6171ed469ca5db51e1fcb94, type: 2}
   _enableTilemapCollider: 1
   _gameObjectOrigin: 1
 --- !u!1839735485 &134829843
@@ -209,6 +210,42 @@ Transform:
   - {fileID: 1614686137}
   m_Father: {fileID: 583882098}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!19719996 &134829845
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134829841}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_MaximumTileChangeCount: 1000
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1 &583882097
 GameObject:
   m_ObjectHideFlags: 0
@@ -496,7 +533,6 @@ GameObject:
   - component: {fileID: 1614686137}
   - component: {fileID: 1614686139}
   - component: {fileID: 1614686138}
-  - component: {fileID: 1614686140}
   m_Layer: 7
   m_Name: RenderTilemap
   m_TagString: Untagged
@@ -606,42 +642,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!19719996 &1614686140
-TilemapCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1614686136}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 1000
-  m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 0
 --- !u!1 &1922505438
 GameObject:
   m_ObjectHideFlags: 0
@@ -748,7 +748,7 @@ GameObject:
   - component: {fileID: 2011989449}
   - component: {fileID: 2011989450}
   m_Layer: 0
-  m_Name: DataTilemap
+  m_Name: Floor Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -820,7 +820,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b152cdadb37e7464081d2bb9b6e8bc65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderTile: {fileID: 11400000, guid: 4564e67b921a97f4eb04d9cf8b64174c, type: 2}
+  _renderTile: {fileID: 11400000, guid: ee9813262bb03614abf6cd884a3c91d8, type: 2}
   _enableTilemapCollider: 0
   _gameObjectOrigin: 0
 --- !u!1 &2122445662

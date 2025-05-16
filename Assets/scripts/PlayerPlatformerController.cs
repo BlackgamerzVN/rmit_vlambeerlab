@@ -6,7 +6,7 @@ public class PlayerPlatformerController : PhysicsObject
 {
     public float _maxSpeed = 7f;
 
-    public float _jumpTakeOffSpeed = 21f;
+    public float _jumpTakeOffSpeed = 15f;
 
     private bool _isMoving;
     private bool _isSlamming;
@@ -37,18 +37,16 @@ public class PlayerPlatformerController : PhysicsObject
             {
                 _velocity.y = _jumpTakeOffSpeed;
             }
-            else if (Input.GetButtonUp("Jump"))
+            else if (Input.GetButtonUp("Jump") && _velocity.y > 0)
             {
-                if (_velocity.y > 0)
-                {
-                    _velocity.y *= .5f;
-                }
+                _velocity.y *= 0.5f;
             }
-            else if (Input.GetKeyDown(KeyCode.S) && _isGrounded == false)
+
+            if (Input.GetKeyDown(KeyCode.S) && !_isGrounded)
             {
                 _velocity.y = -_jumpTakeOffSpeed * 2;
-                _isMoving=false;
-                _isSlamming=true;
+                _isMoving = false;
+                _isSlamming = true;
             }
         }
         if (_isSlamming && _isGrounded)
@@ -70,6 +68,6 @@ public class PlayerPlatformerController : PhysicsObject
 
         int r = 1;
 
-        pathmaker.DestructiveTile(x, y, r);
+        pathmaker.DestructiveTile(x, y - 1, r);
     }
 }

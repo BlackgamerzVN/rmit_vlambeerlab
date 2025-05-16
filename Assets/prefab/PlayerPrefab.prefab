@@ -149,7 +149,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.8, y: 1.6}
+  m_Size: {x: 0.9, y: 1.8}
   m_Direction: 0
 --- !u!114 &3797832645574949440
 MonoBehaviour:
@@ -188,7 +188,7 @@ MonoBehaviour:
   _numOfConstrantRuns: 50
   _collisionSegmentInterval: 50
   _maxSpeed: 7
-  _jumpTakeOffSpeed: 21
+  _jumpTakeOffSpeed: 15
 --- !u!120 &-5195757094403687061
 LineRenderer:
   serializedVersion: 2
@@ -311,15 +311,16 @@ MonoBehaviour:
   _gravityForce: {x: 0, y: -1}
   _numOfConstrantRuns: 50
   _collisionSegmentInterval: 2
-  _grappleLength: 0
   _grappleLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   _numOfRopeSegments: 10
   _ropeSegmentLength: 0.45
   _collisionMask:
     serializedVersion: 2
     m_Bits: 128
-  _collisionRadius: 0.1
-  _bounceFactor: 0
-  _correctionClampAmount: 0
+  _collisionRadius: 0.05
+  _maxCollisionRadius: 0.5
+  _bounceFactor: 1
+  _maxStretch: 1
+  springStrength: 0.025

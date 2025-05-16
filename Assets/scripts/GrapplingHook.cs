@@ -8,7 +8,7 @@ public class GrapplingHook : PhysicsObject
     // Execute Grappling Hook mechanic using Velvet Intergration logic
 
     [Header("Grapple")]
-    [SerializeField] private float _grappleLength;
+    [SerializeField] private float _grappleDistance = 50f;
     [SerializeField] private LayerMask _grappleLayer;
 
     // A check to determine whenever grappling hook logics should be running or not
@@ -24,12 +24,16 @@ public class GrapplingHook : PhysicsObject
     [Header("Local Rope Physic")]
     [SerializeField] private LayerMask _collisionMask;
     [SerializeField] private float _collisionRadius = 0.1f;
+    [SerializeField] private float _maxCollisionRadius = 1f;
     [SerializeField] private float _bounceFactor = 0.1f;
-    [SerializeField] private float _correctionClampAmount;
+    [SerializeField] private float _maxStretch = 3f;
+    [SerializeField] private float springStrength = 1f;
+    [SerializeField] private float dampingFactor = 0.5f;
 
     static Pathmaker pathmaker;
     private LineRenderer _lineRenderer;
     private List<RopeSegment> _ropeSegments = new List<RopeSegment>();
+    private Vector3[] _cachedRopePositions;
 
     private Vector3 _ropeStartPoint;
     private Vector3 _ropeEndPoint;
@@ -41,6 +45,8 @@ public class GrapplingHook : PhysicsObject
         _lineRenderer.positionCount = _numOfRopeSegments;
         _lineRenderer.enabled = false;
         _isGrappling = false;
+
+        _cachedRopePositions = new Vector3[_numOfRopeSegments];
 
         GameObject pathmakerObject = GameObject.FindGameObjectWithTag("Pathmaker");
 
@@ -62,19 +68,21 @@ public class GrapplingHook : PhysicsObject
             mousePos = Camera.main.ScreenToWorldPoint(mousePos);
             //Debug.Log("C2: " + mousePos.ToString());
 
-            Vector2 dir = ((Vector2)mousePos - _rb2d.position).normalized;
-            float dist = ((Vector2)mousePos - _rb2d.position).magnitude;
+            Vector2 directionVector = (Vector2)mousePos - _rb2d.position;
+            Vector2 dir = directionVector.normalized;
+            float dist = directionVector.magnitude;
             Debug.Log("Click Direction: " + dir);
 
             // Only grapple if direction is upward
-            if (dir.y > 0)
+            //if (dir.y > 0)
             {
                 _isGrappling = true;
 
                 //RaycastHit2D hit = Physics2D.Raycast(_rb2d.position, dir, Mathf.Infinity, _collisionMask);
 
                 RaycastHit hit = new RaycastHit();
-                if(Physics.Raycast(_rb2d.position, dir, out hit, Mathf.Infinity, _collisionMask))
+                float maxGrappleDistance = _grappleDistance; // or some other reasonable value
+                if (Physics.Raycast(_rb2d.position, dir, out hit, maxGrappleDistance, _grappleLayer))
                 {
                     Vector3 offset = new Vector3(minMoveDistance, -minMoveDistance, 0);
 
@@ -88,13 +96,16 @@ public class GrapplingHook : PhysicsObject
 
                     for (int i = 0; i < _numOfRopeSegments; i++)
                     {
-                        _ropeStartPoint.z = -1;
                         _ropeSegments.Add(new RopeSegment(_ropeStartPoint));
 
-                        _ropeStartPoint = Vector3.MoveTowards(_ropeStartPoint, _rb2d.position, _ropeSegmentLength);
+                        //_ropeStartPoint = Vector3.MoveTowards(_ropeStartPoint, _rb2d.position, _ropeSegmentLength);
 
-                        //_ropeStartPoint = Vector3.MoveTowards(_ropeStartPoint, _rb2d.position, dist / _ropeSegments.Count);
+                        _ropeStartPoint = Vector3.MoveTowards(_ropeStartPoint, _rb2d.position, dist / _ropeSegments.Count);
                     }
+                }
+                else
+                {
+                    Debug.Log("No grapple target hit.");
                 }
             }
         }
@@ -112,14 +123,16 @@ public class GrapplingHook : PhysicsObject
     {
         if (_isGrappling)
         {
-            Vector3[] ropePosition = new Vector3[_numOfRopeSegments];
             for (int i = 0; i < _numOfRopeSegments; i++)
             {
-                ropePosition[i] = _ropeSegments[i].CurrentPosition;
+                _cachedRopePositions[i] = _ropeSegments[i].CurrentPosition;
             }
 
-            _lineRenderer.SetPositions(ropePosition);
+            _lineRenderer.SetPositions(_cachedRopePositions);
         }
+
+        if (_lineRenderer.positionCount != _numOfRopeSegments)
+            _lineRenderer.positionCount = _numOfRopeSegments;
     }
     // Compute simulations for Verlet Integration ropes.
     protected override void ComputeGrapplingHookSimulate(bool isGrounded)
@@ -144,50 +157,84 @@ public class GrapplingHook : PhysicsObject
         }
     }
     // Compute constraints for Verlet Integration ropes.
+    private void ApplyConstraintsToSegment(int i)
+    {
+        if (i < 0 || i >= _ropeSegments.Count - 1) return;
+
+        // Extract current and next segments
+        RopeSegment currentSeg = _ropeSegments[i];
+        RopeSegment nextSeg = _ropeSegments[i + 1];
+
+        // Compute the distance and how much the rope is stretched
+        float dist = Vector2.Distance(currentSeg.CurrentPosition, nextSeg.CurrentPosition);
+        float difference = dist - _ropeSegmentLength;
+
+        if (dist == 0) return; // Avoid divide-by-zero in normalization
+
+        // Clamp the difference to avoid excessive stretching
+        difference = Mathf.Clamp(difference, -_maxStretch, _maxStretch);
+
+        // Calculate direction of the force and apply spring strength
+        Vector2 changeDir = (currentSeg.CurrentPosition - nextSeg.CurrentPosition).normalized;
+        Vector2 changeVector = changeDir * (difference * springStrength);
+
+        // Apply damping if desired
+        ApplyDamping(ref changeVector);
+
+        bool isNotFirstRopeSegment = (i > 0 && i < _numOfRopeSegments - 2);
+        bool isLastRopeSegment = (i == _numOfRopeSegments - 2);
+
+        // Adjust positions of current and next segments based on the calculated change
+        if (isNotFirstRopeSegment)
+        {
+            // Normal segments get split force application
+            currentSeg.CurrentPosition -= (changeVector * 0.5f);
+            nextSeg.CurrentPosition += (changeVector * 0.5f);
+        }
+        else if (isLastRopeSegment)
+        {
+            // For the last segment, move the player (Rigidbody)
+            nextSeg.CurrentPosition += changeVector;
+            MovePlayerToNextSegment(nextSeg);
+        }
+        else
+        {
+            // First segment just adjusts the next segment
+            nextSeg.CurrentPosition += changeVector;
+        }
+
+        // Overwrite the rope segments with the updated positions
+        _ropeSegments[i] = currentSeg;
+        _ropeSegments[i + 1] = nextSeg;
+    }
+
+    private void MovePlayerToNextSegment(RopeSegment nextSeg)
+    {
+        // Use MovePosition to move Rigidbody smoothly according to physics
+        _rb2d.MovePosition(Vector2.MoveTowards(_rb2d.position, nextSeg.CurrentPosition,5f));
+        _velocity.y = 0f;
+    }
+
+    private void ApplyDamping(ref Vector2 changeVector)
+    {
+        // Damping reduces velocity over time (helps to avoid oscillations)
+        changeVector *= (1f - dampingFactor);
+    }
+
     protected override void ComputeGrapplingHookApplyConstraints()
     {
         if (_isGrappling)
         {
-            //Keep first point attached to designated transform
-            //Updates overtime.
-
-            Vector3 offset = new Vector3(0, 0, -1);
-
+            // Keep the first segment attached to the grapple point
+            Vector3 offset = new Vector3(0, 0, -1); // Optional, adjusts Z to ensure rope is not at the same depth
             RopeSegment firstSegment = _ropeSegments[0];
             firstSegment.CurrentPosition = _grapplePoint + offset;
             _ropeSegments[0] = firstSegment;
 
+            // Apply constraints for each rope segment
             for (int i = 0; i < _numOfRopeSegments - 1; i++)
             {
-                // Extract
-                RopeSegment currentSeg = _ropeSegments[i];
-                RopeSegment nextSeg = _ropeSegments[i + 1];
-
-                // Compute
-                float dist = (currentSeg.CurrentPosition - nextSeg.CurrentPosition).magnitude;
-                float difference = (dist - _ropeSegmentLength);
-
-                Vector2 changeDir = (currentSeg.CurrentPosition - nextSeg.CurrentPosition).normalized;
-                Vector2 changeVector = changeDir * difference;
-
-                if (i != 0 && i != _numOfRopeSegments - 2)
-                {
-                    currentSeg.CurrentPosition -= (changeVector * 0.5f);
-                    nextSeg.CurrentPosition += (changeVector * 0.5f);
-                }
-                else if (i == _numOfRopeSegments - 2)
-                {
-                    nextSeg.CurrentPosition += changeVector;
-                    _rb2d.position = Vector2.MoveTowards(_rb2d.position, nextSeg.CurrentPosition, 0.5f);
-                }
-                else
-                {
-                    nextSeg.CurrentPosition += changeVector;
-                }
-
-                // Overwrite
-                _ropeSegments[i] = currentSeg;
-                _ropeSegments[i + 1] = nextSeg;
+                ApplyConstraintsToSegment(i);
             }
         }
     }
@@ -204,10 +251,11 @@ public class GrapplingHook : PhysicsObject
                 // Compute
                 Vector2 velocity = segment.CurrentPosition - segment.OldPosition;
                 int maxColliders = 32;
-
                 Collider[] hitColliders = new Collider[maxColliders];
 
-                int numOfColliders = Physics.OverlapSphereNonAlloc(segment.CurrentPosition, _collisionRadius * i, hitColliders, _collisionMask);
+                float radius = Mathf.Min(_collisionRadius * i, _maxCollisionRadius);
+
+                int numOfColliders = Physics.OverlapSphereNonAlloc(segment.CurrentPosition, radius, hitColliders, _collisionMask);
 
                 // This must not be used with Duel Grid Tile collision!
 
@@ -224,20 +272,23 @@ public class GrapplingHook : PhysicsObject
                     Vector2 closestPoint = collider.ClosestPoint(segment.CurrentPosition);
                     float distance = Vector2.Distance(segment.CurrentPosition, closestPoint);
 
+                    // Optional: avoid self-collision
+                    if (collider.attachedRigidbody == _rb2d) continue;
+
                     // if within the collision radius
                     if (distance < _collisionRadius * i)
                     {
                         Vector2 normal = (segment.CurrentPosition - closestPoint).normalized;
+
                         if (normal == Vector2.zero)
                         {
-                            // fallback method
                             normal = (segment.CurrentPosition - (Vector2)collider.transform.position).normalized;
-
-                            float depth = _collisionRadius * i - distance;
-                            segment.CurrentPosition += normal * depth;
-
-                            velocity = Vector2.Reflect(velocity, normal) * _bounceFactor;
                         }
+
+                        float depth = _collisionRadius * i - distance;
+                        segment.CurrentPosition += normal * depth;
+
+                        velocity = Vector2.Reflect(velocity, normal) * _bounceFactor;
                     }
                 }
 

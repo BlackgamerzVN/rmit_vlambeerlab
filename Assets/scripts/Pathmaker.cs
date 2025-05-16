@@ -27,7 +27,7 @@ public class Pathmaker : MonoBehaviour
     //	Declare a private integer called counter that starts at 0; 		// counter will track how many floor tiles I've instantiated
     [Header("The value we got from input field")]
 
-    static public int maxFloorCount = 500;
+    static public int maxFloorCount = 1000;
 
     public int chanceToChange = 75;
 
@@ -88,8 +88,6 @@ public class Pathmaker : MonoBehaviour
     [SerializeField]
     private float CameraMovementSpeed = 100f;
 
-    private readonly bool CameraMovement = false;
-
     public enum Grid
     {
         FLOOR,
@@ -122,67 +120,6 @@ public class Pathmaker : MonoBehaviour
         {
             SceneReset();
         }
-
-        // Where primary Camera control is located
-        if (CameraMovement == true)
-        {
-            /*
-            // Move Up control
-            if (Input.GetKey(UpKey) || Input.GetKey(AltUpKey))
-            {
-                Camera.main.transform.Translate(0, CameraMovementSpeed * Time.deltaTime, 0);
-                // Happens once after the key is pressed down
-                HotkeyDebug(UpKey, AltUpKey);
-            }
-
-            // Move Down control
-            if (Input.GetKey(DownKey) || Input.GetKey(AltDownKey))
-            {
-                Camera.main.transform.Translate(0, -CameraMovementSpeed * Time.deltaTime, 0);
-                // Happens once after the key is pressed down
-                HotkeyDebug(DownKey, AltDownKey);
-            }
-
-            // Move Left control
-            if (Input.GetKey(LeftKey) || Input.GetKey(AltLeftKey))
-            {
-                Camera.main.transform.Translate(-CameraMovementSpeed * Time.deltaTime, 0, 0);
-                // Happens once after the key is pressed down
-                HotkeyDebug(LeftKey, AltLeftKey);
-            }
-
-            // Move Right control
-            if (Input.GetKey(RightKey) || Input.GetKey(AltRightKey))
-            {
-                Camera.main.transform.Translate(CameraMovementSpeed * Time.deltaTime, 0, 0);
-                // Happens once after the key is pressed down
-                HotkeyDebug(RightKey, AltRightKey);
-            }
-            */
-            // Camera Sprint
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                CameraMovementSpeed *= 2;
-            }
-            
-            // Camera Cancel Sprint
-            if (Input.GetKeyUp(KeyCode.LeftShift))
-            {
-                CameraMovementSpeed /= 2;
-            }
-
-            // Camera Zoom in
-            if (Input.GetKey(KeyCode.E))
-            {
-                Camera.main.transform.Translate(0,0,CameraMovementSpeed * Time.deltaTime);
-            }
-            
-            // Camera Zoom Out
-            if (Input.GetKey(KeyCode.Q))
-            {
-                Camera.main.transform.Translate(0, 0, -CameraMovementSpeed * Time.deltaTime);
-            }
-        }
     }
 
     // Problem 1: Not setting script per individual Pathmaker prefab will makes error pops like crazy
@@ -194,6 +131,9 @@ public class Pathmaker : MonoBehaviour
     // Basing this project based on Walker Generator worked on past days to complete the script. This is where CentralPathMaker control comes in handy.
 
     // This is Central Pathmaker Control. Where PathMaker sections is truly executed. Like human with brain, so is Pathmaker with collective processing controls.
+
+    // Room struct
+    
     IEnumerator CentralPathmakerControl()
     {
         if (maxFloorCount == 0)
@@ -331,11 +271,11 @@ public class Pathmaker : MonoBehaviour
 
             GameObject curPathmaker = PathObjects[i];
 
-            if (random <= 0.25f) // first 1/4 chance rotate it clockwise
+            if (random <= 0.45f) // first 1/4 chance rotate it clockwise
             {
                 curPathmaker.transform.Rotate(new Vector3(0, 0, 90));
             }
-            else if (random > 0.25f && random <= 0.5f) // 2nd 1/4 chance rotate it counterclockwise
+            else if (random > 0.45f && random <= 0.9f) // 2nd 1/4 chance rotate it counterclockwise
             {
                 curPathmaker.transform.Rotate(new Vector3(0, 0, -90));
             }
@@ -692,7 +632,7 @@ public class Pathmaker : MonoBehaviour
         int curX = Mathf.FloorToInt(playerXPos);
 
         // Minus one to make sure this only happens below the player
-        int curY = Mathf.FloorToInt(playerYPos) - 1;
+        int curY = Mathf.FloorToInt(playerYPos);
 
         // First clear all wall tiles and fill empty files within the radius
         for (int y = curY + r; y >= curY - r; y--)
@@ -728,24 +668,53 @@ public class Pathmaker : MonoBehaviour
             }
         }
     }
+    private bool IsWithinBounds(int x, int y)
+    {
+        return x >= 0 && x < gridHandler.GetLength(0) &&
+               y >= 0 && y < gridHandler.GetLength(1);
+    }
+
+    private void PlaceWallTile(Vector3Int pos)
+    {
+        wallDualGridTilemap.DataTilemap.SetTile(pos, wallDualGridTilemap.DataTile);
+        floorDualGridTilemap.DataTilemap.SetTile(pos, null);
+        gridHandler[pos.x, pos.y] = Grid.WALL;
+    }
+
+    public bool WallTilePlacement(Vector3Int tilePos)
+    {
+        int x = tilePos.x;
+        int y = tilePos.y;
+
+        // Check bounds for all relevant positions
+        if (!IsWithinBounds(x, y + 2) ||
+            !IsWithinBounds(x - 1, y) ||
+            !IsWithinBounds(x + 1, y))
+            return false;
+
+        // Check that all involved tiles are FLOOR
+        if (gridHandler[x, y] == Grid.FLOOR &&
+            gridHandler[x, y + 1] == Grid.FLOOR &&
+            gridHandler[x, y + 2] == Grid.FLOOR &&
+            gridHandler[x - 1, y] == Grid.FLOOR &&
+            gridHandler[x + 1, y] == Grid.FLOOR)
+        {
+            PlaceWallTile(tilePos);
+            PlaceWallTile(tilePos + Vector3Int.left);
+            PlaceWallTile(tilePos + Vector3Int.right);
+            return true;
+        }
+
+        return false;
+    }
 
     public void FloorTilePlacement(Vector3Int tilePos)
-    {
-        if (gridHandler[tilePos.x, tilePos.y] == Grid.FLOOR && gridHandler[tilePos.x, tilePos.y + 1] == Grid.FLOOR && gridHandler[tilePos.x, tilePos.y + 2] == Grid.FLOOR)
-        {
-            wallDualGridTilemap.DataTilemap.SetTile(tilePos, wallDualGridTilemap.DataTile);
-            floorDualGridTilemap.DataTilemap.SetTile(tilePos, null);
-            gridHandler[tilePos.x, tilePos.y] = Grid.WALL;
-        }
-    }
-    
-    public void WallTilePlacement(Vector3Int tilePos)
     {
         if (gridHandler[tilePos.x, tilePos.y] == Grid.WALL)
         {
             wallDualGridTilemap.DataTilemap.SetTile(tilePos, null);
             floorDualGridTilemap.DataTilemap.SetTile(tilePos, floorDualGridTilemap.DataTile);
-            gridHandler[tilePos.x, tilePos.y] = Grid.WALL;
+            gridHandler[tilePos.x, tilePos.y] = Grid.FLOOR;
 
             int x = tilePos.x;
             int y = tilePos.y;
@@ -768,45 +737,58 @@ public class Pathmaker : MonoBehaviour
     // 3. ... repeat until walls surround your entire floorplan
     // (technically, you will end up raycasting the same spot over and over... but the "proper" way to do this would involve keeping more lists and arrays to track all this data)
 
-    // This is where Walls are created
+    // hasCreatedWall becomes true if any surrounding tile triggers WallGenerator successfully.
+    // Once true, it stays true until the end of this tile's wall generation pass.
     IEnumerator CreateWall()
     {
         cameraAllowedToMove = true;
-        for (int y = gridHandler.GetLength(1) - 1; y > 0; y--)
+
+        int batchSize = 50; // Tune this number based on performance
+        int currentBatchCount = 0;
+
+        int width = gridHandler.GetLength(0);
+        int height = gridHandler.GetLength(1);
+
+        bool InBounds(int x, int y) =>
+            x >= 0 && x < width && y >= 0 && y < height;
+
+        for (int y = height - 1; y >= 0; y--)
         {
-            for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
+            for (int x = 0; x < width; x++)
             {
                 if (gridHandler[x, y] == Grid.FLOOR)
                 {
-                    bool hasCreatedWall = false;
-
-                    // Generate Walls if there are adjustant tiles
-
-                    // boolean is now executed within itself OR the defined bool
-
-                    // Once the variable is set as true in any circumtance, it will always default to true unless stated otherwise or moving to other vector, thus allowing continuous loop of wall gen,
-
-                    int iteration = 1;
-
-                    for (int z = 1; z <= iteration; z++)
+                    Vector2Int[] directions = new Vector2Int[]
                     {
-                        hasCreatedWall |= WallGenerator(x + z, y);
-                        hasCreatedWall |= WallGenerator(x - z, y);
-                        hasCreatedWall |= WallGenerator(x, y + z);
-                        hasCreatedWall |= WallGenerator(x, y - z);
-                        hasCreatedWall |= WallGenerator(x + z, y - z);
-                        hasCreatedWall |= WallGenerator(x - z, y - z);
-                        hasCreatedWall |= WallGenerator(x + z, y + z);
-                        hasCreatedWall |= WallGenerator(x - z, y + z);
+                    new Vector2Int(1, 0), new Vector2Int(-1, 0),
+                    new Vector2Int(0, 1), new Vector2Int(0, -1),
+                    new Vector2Int(1, 1), new Vector2Int(-1, -1),
+                    new Vector2Int(-1, 1), new Vector2Int(1, -1)
+                    };
+
+                    foreach (var dir in directions)
+                    {
+                        int nx = x + dir.x;
+                        int ny = y + dir.y;
+
+                        if (InBounds(nx, ny))
+                        {
+                            if(WallGenerator(nx, ny))
+                            {
+                                currentBatchCount++;
+                            }
+                        }
                     }
 
-                    if (hasCreatedWall)
+                    if (currentBatchCount >= batchSize)
                     {
+                        currentBatchCount = 0;
                         yield return null;
                     }
                 }
             }
         }
+
         StartCoroutine(PlayerSpawner());
     }
 
@@ -851,11 +833,15 @@ public class Pathmaker : MonoBehaviour
 
     IEnumerator PlayerSpawner()
     {
-        bool playerSpanwed = false;
+        CursorControllerObject.SetActive(true);
+
+        bool playerSpawned = false;
         for (int y = gridHandler.GetLength(1) - 1; y > 0; y--)
         {
             for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
             {
+                if (playerSpawned) yield break;
+
                 bool floorCheck = false;
 
                 // Runs a first check if the area it's scanning on is floor
@@ -867,14 +853,13 @@ public class Pathmaker : MonoBehaviour
 
                 // If all checks satisfied, loop ends
 
-                if (floorCheck == true && playerSpanwed == false)
+                if (floorCheck == true && playerSpawned == false)
                 {
-                    playerSpanwed |= WallCheckForPlayer(x, y);
+                    playerSpawned |= WallCheckForPlayer(x, y);
                     yield return null;
                 }
             }
         }
-        CursorControllerObject.SetActive(true);
     }
 
     public bool FloorCheck(int x, int y)
@@ -905,7 +890,6 @@ public class Pathmaker : MonoBehaviour
             }
         }
         return false;
-
     }
 
     IEnumerator PlayerTracker(GameObject playerObject)

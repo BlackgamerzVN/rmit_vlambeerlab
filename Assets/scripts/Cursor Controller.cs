@@ -24,13 +24,13 @@ public class CursorController : MonoBehaviour
 
         pathmaker = pathmakerObject.GetComponent<Pathmaker>();
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             pathmaker.FloorTilePlacement(tilePos);
         }
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            pathmaker.WallTilePlacement(tilePos);
+            pathmaker.WallTilePlacement(tilePos + new Vector3Int(0, -1, 0));
         }
     }
 

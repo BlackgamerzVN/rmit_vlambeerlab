@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 804074478759e2c46ac8b35a35b0beef
+guid: 0b8b41e7a11631a44a2b1784d1b4f172
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -39,13 +39,13 @@ TextureImporter:
     mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: 1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 32
@@ -136,7 +136,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_0
+      name: 16_pieces_steel_2_0
       rect:
         serializedVersion: 2
         x: 0
@@ -150,14 +150,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d9a0a99a69650c2449fe5f08c4ce0ac5
-      internalID: 1327062791
+      spriteID: 501708f13e79fec4fbc2a1e44893cde5
+      internalID: -692380859
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_1
+      name: 16_pieces_steel_2_1
       rect:
         serializedVersion: 2
         x: 32
@@ -171,14 +171,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 48c9066e8c4aa5841af22a9892399eb6
-      internalID: 1655539104
+      spriteID: 0cc6d738d378d084897c1cbdc2914cb0
+      internalID: 369259873
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_2
+      name: 16_pieces_steel_2_2
       rect:
         serializedVersion: 2
         x: 64
@@ -192,14 +192,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4d65adcb031894246acda6c51121efcf
-      internalID: 978244555
+      spriteID: d90ef9ec40fd8354ca8c4590e815632c
+      internalID: -1446569985
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_3
+      name: 16_pieces_steel_2_3
       rect:
         serializedVersion: 2
         x: 96
@@ -213,14 +213,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5f21abd22f2923e4bb34107f2876e47b
-      internalID: 2096455918
+      spriteID: ef92c2146df5fb24187072856e7e7e91
+      internalID: -1464491429
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_4
+      name: 16_pieces_steel_2_4
       rect:
         serializedVersion: 2
         x: 0
@@ -234,14 +234,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8dd101cbec790fb418519cba0da95905
-      internalID: 1743734115
+      spriteID: db9cc14d760230243b797bd5b67a7092
+      internalID: -947887302
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_5
+      name: 16_pieces_steel_2_5
       rect:
         serializedVersion: 2
         x: 32
@@ -255,14 +255,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 725092396bb4efd46a2fb5eff4945c3a
-      internalID: 1141876428
+      spriteID: 7711ba1aa5222d445ac795f74411a7a8
+      internalID: 924771612
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_6
+      name: 16_pieces_steel_2_6
       rect:
         serializedVersion: 2
         x: 64
@@ -276,14 +276,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2df0d4ec43ac5dd458664df7dd345f7c
-      internalID: -1178196998
+      spriteID: c96a1d2b2de1c3144ac0f7680634746c
+      internalID: 1865266682
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_7
+      name: 16_pieces_steel_2_7
       rect:
         serializedVersion: 2
         x: 96
@@ -297,14 +297,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 710cebbab74ce8545bc5afa9809b7d8a
-      internalID: -1420124311
+      spriteID: 5b44ae77c97ea544f8af9e14c2d8f04f
+      internalID: -1543016542
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_8
+      name: 16_pieces_steel_2_8
       rect:
         serializedVersion: 2
         x: 0
@@ -318,14 +318,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 625799a85e05b5d45bebe1c5f3c310da
-      internalID: -1213265331
+      spriteID: 536acd98e25e6b3428f9b991afb39998
+      internalID: -668685017
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_9
+      name: 16_pieces_steel_2_9
       rect:
         serializedVersion: 2
         x: 32
@@ -339,14 +339,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7c81623f97e057840b1c434298baf26f
-      internalID: -2124950069
+      spriteID: 98c123f6594553b47b34bb15fab43240
+      internalID: 1641804484
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_10
+      name: 16_pieces_steel_2_10
       rect:
         serializedVersion: 2
         x: 64
@@ -360,14 +360,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 772093a58aa68df44932a1e4598b8a12
-      internalID: 470821026
+      spriteID: 7674374798554364ca75062f69db7685
+      internalID: 887195768
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_11
+      name: 16_pieces_steel_2_11
       rect:
         serializedVersion: 2
         x: 96
@@ -381,14 +381,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c4a83b020dddf5a42b4c51510def2307
-      internalID: 1616054662
+      spriteID: 31b4c948627defc42bd271da13cd1ef9
+      internalID: 1288780242
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_12
+      name: 16_pieces_steel_2_12
       rect:
         serializedVersion: 2
         x: 0
@@ -402,14 +402,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 943cd920336fca74c8ce84b7071ba72d
-      internalID: 451310250
+      spriteID: 0a40666f8a129c549b70c3e10652b995
+      internalID: 1042836733
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_13
+      name: 16_pieces_steel_2_13
       rect:
         serializedVersion: 2
         x: 32
@@ -423,14 +423,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a3cc04aeb422aa34faa56ad92f0dba87
-      internalID: -2064959184
+      spriteID: 812c3b2bf5894524eb9a24da55f56924
+      internalID: 1216053652
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_14
+      name: 16_pieces_steel_2_14
       rect:
         serializedVersion: 2
         x: 64
@@ -444,14 +444,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8dd7349521e958e4bad680a0d40a0391
-      internalID: 1769245560
+      spriteID: ace51694db1ca36478f801373c9f19c8
+      internalID: 3824039
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 16_pieces_wooden_floor_on_grass_tile_15
+      name: 16_pieces_steel_2_15
       rect:
         serializedVersion: 2
         x: 96
@@ -465,8 +465,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 796982815df6b8b4f809744ea23aa3d8
-      internalID: 1660044799
+      spriteID: e13615eec0d10474bb3e2ddd150152a0
+      internalID: -983160908
       vertices: []
       indices: 
       edges: []
@@ -474,7 +474,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 2b909b3840526914f9a2ac2a57cc3d32
     internalID: 0
     vertices: []
     indices: 
@@ -482,22 +482,22 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      16_pieces_wooden_floor_on_grass_tile_0: 1327062791
-      16_pieces_wooden_floor_on_grass_tile_1: 1655539104
-      16_pieces_wooden_floor_on_grass_tile_10: 470821026
-      16_pieces_wooden_floor_on_grass_tile_11: 1616054662
-      16_pieces_wooden_floor_on_grass_tile_12: 451310250
-      16_pieces_wooden_floor_on_grass_tile_13: -2064959184
-      16_pieces_wooden_floor_on_grass_tile_14: 1769245560
-      16_pieces_wooden_floor_on_grass_tile_15: 1660044799
-      16_pieces_wooden_floor_on_grass_tile_2: 978244555
-      16_pieces_wooden_floor_on_grass_tile_3: 2096455918
-      16_pieces_wooden_floor_on_grass_tile_4: 1743734115
-      16_pieces_wooden_floor_on_grass_tile_5: 1141876428
-      16_pieces_wooden_floor_on_grass_tile_6: -1178196998
-      16_pieces_wooden_floor_on_grass_tile_7: -1420124311
-      16_pieces_wooden_floor_on_grass_tile_8: -1213265331
-      16_pieces_wooden_floor_on_grass_tile_9: -2124950069
+      16_pieces_steel_2_0: -692380859
+      16_pieces_steel_2_1: 369259873
+      16_pieces_steel_2_10: 887195768
+      16_pieces_steel_2_11: 1288780242
+      16_pieces_steel_2_12: 1042836733
+      16_pieces_steel_2_13: 1216053652
+      16_pieces_steel_2_14: 3824039
+      16_pieces_steel_2_15: -983160908
+      16_pieces_steel_2_2: -1446569985
+      16_pieces_steel_2_3: -1464491429
+      16_pieces_steel_2_4: -947887302
+      16_pieces_steel_2_5: 924771612
+      16_pieces_steel_2_6: 1865266682
+      16_pieces_steel_2_7: -1543016542
+      16_pieces_steel_2_8: -668685017
+      16_pieces_steel_2_9: 1641804484
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

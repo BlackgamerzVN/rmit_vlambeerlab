@@ -111,7 +111,7 @@ public class PhysicsObject : MonoBehaviour
             ComputeGrapplingHookApplyConstraints();
 
             // Checks if i is divisable by 0
-            if (i % _collisionSegmentInterval == 0)
+            if (_collisionSegmentInterval > 0 && i % _collisionSegmentInterval == 0)
             {
                 ComputeGrapplingHookHandleCollision();
             }
@@ -154,16 +154,20 @@ public class PhysicsObject : MonoBehaviour
 
                 if (projection < 0)
                 {
-                    _velocity = _velocity - projection * currentNormal;
+                    _velocity -= projection * currentNormal;
                 }
 
                 float modifiedDistance = _hitBufferList[i].distance - _shellRadius;
 
                 distance = modifiedDistance < distance ? modifiedDistance : distance;
+                // Equivalent to distance = Mathf.Min(modifiedDistance, distance);
             }
         }
 
-        _rb2d.position = _rb2d.position + move.normalized * distance;
+        if (move.sqrMagnitude > 0.0001f)
+        {
+            _rb2d.position += move.normalized * distance;
+        }
 
     }
 }
