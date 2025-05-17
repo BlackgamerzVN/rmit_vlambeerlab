@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEditor.PlayerSettings;
 
 // INTRO TO PROC GEN LAB
 // all students: complete steps 1-6, as listed in this file
@@ -151,10 +152,10 @@ public class Pathmaker : MonoBehaviour
             }
         }
 
-        Vector3Int TileCenter = new Vector3Int(gridHandler.GetLength(0) / 2, gridHandler.GetLength(1) / 2, 0);
+        Vector3Int tileCenter = new Vector3Int(gridHandler.GetLength(0) / 2, gridHandler.GetLength(1) / 2, 0);
 
         // spawn the first PathMaker
-        GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, TileCenter + new Vector3(0.5f, 0.5f, 0), Quaternion.Euler(0, 0, 0));
+        GameObject myNewPathmaker = Instantiate(pathmakerSpherePrefabObject, tileCenter + new Vector3(0.5f, 0.5f, 0), Quaternion.Euler(0, 0, 0));
 
         Camera.main.transform.Translate(myNewPathmaker.transform.position.x, myNewPathmaker.transform.position.y, 0);
 
@@ -164,6 +165,8 @@ public class Pathmaker : MonoBehaviour
         StartCoroutine(LevelSizeScanner());
 
         float pathChance = (float)chanceToChange / 100f;
+
+        float roomChance = (float)_chanceToCreateRoom / 100f;
 
         while (floors <= maxFloorCount) // Updates overtime as long as the condition is allowed
         {
@@ -186,12 +189,14 @@ public class Pathmaker : MonoBehaviour
                     Vector3 curPathmakerPos = curPathmaker.transform.position;
 
                     bool hasCreatedFloor = false;
-                    
+
+                    bool onFloorTile = gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] == Grid.FLOOR;
+
                     // If there are other pathmaker in proximity, disable PathmakerChance and force them to rotate other direction.
 
                     if (Physics.CheckSphere(curPathmakerPos, 0.25f, pathmakerLayerMask))
                     {
-                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] == Grid.FLOOR) // If the area below it is FLOOR, DO NOT create floor
+                        if (onFloorTile) // If the area below it is FLOOR, DO NOT create floor
                         {
                             Debug.Log("Floor Collided");
 
@@ -200,7 +205,7 @@ public class Pathmaker : MonoBehaviour
                             PathmakerUpdate(i);
                         }
 
-                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] != Grid.FLOOR) // If the area below it is NOT floor, DO create floor
+                        if (!onFloorTile) // If the area below it is NOT floor, DO create floor
                         {
                             Debug.Log("Floor Not Collided");
 
@@ -210,15 +215,24 @@ public class Pathmaker : MonoBehaviour
 
                             floors++;
                         }
+                        
+                        // Occasionally spawn a room
+                        if (Random.value < roomChance)
+                        {
+                            Vector3 pathPos = curPathmaker.transform.position;
+                            Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(pathPos.x), Mathf.RoundToInt(pathPos.y));
+                            StartCoroutine(RoomSpawner(gridPos));
+                        }
 
                         if (hasCreatedFloor)
                         {
                             yield return new WaitForSeconds(waitTime / PathObjects.Count);
                         }
+
                     }
                     else 
                     {
-                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] == Grid.FLOOR) // If the area below it is FLOOR, DO NOT create floor
+                        if (onFloorTile) // If the area below it is FLOOR, DO NOT create floor
                         {
                             Debug.Log("Floor Collided");
 
@@ -229,7 +243,7 @@ public class Pathmaker : MonoBehaviour
                             PathmakerChance(i, numOfPathObject, pathmakerLifeSpan, pathmakerList, pathChance);
                         }
 
-                        if (gridHandler[(int)curPathmakerPos.x, (int)curPathmakerPos.y] != Grid.FLOOR) // If the area below it is NOT floor, DO create floor
+                        if (!onFloorTile) // If the area below it is NOT floor, DO create floor
                         {
                             Debug.Log("Floor Not Collided");
 
@@ -242,11 +256,21 @@ public class Pathmaker : MonoBehaviour
                             floors++;
                         }
 
+                        // Occasionally spawn a room
+                        if (Random.value < roomChance)
+                        {
+                            Vector3 pathPos = curPathmaker.transform.position;
+                            Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(pathPos.x), Mathf.RoundToInt(pathPos.y));
+                            StartCoroutine(RoomSpawner(gridPos));
+                        }
+
                         if (hasCreatedFloor)
                         {
                             yield return new WaitForSeconds(waitTime / PathObjects.Count);
                         }
                     }
+
+
                 }
             }
         }
@@ -254,42 +278,35 @@ public class Pathmaker : MonoBehaviour
         // Starts Pathmaker Self Destruct Sequence
         StartCoroutine(PathmakerSelfDestruct());
     }
+
+
+    // Back to regular Pathmaker logics
+
     void PathmakerChance(int i, int numOfPathObject, int distanceLeft, List<GameObject> pathObjectsList, float pathChance)
     {
-        //		If counter is less than 50, then:
-        //			Generate a random number from 0.0f to 1.0f;
-        //			If random number is less than 0.25f, then rotate myself 90 degrees;
-        //				... Else if number is 0.25f-0.5f, then rotate myself -90 degrees;
-        //				... Else if number is 0.99f-1.0f, then instantiate a pathmakerSpherePrefab clone at my current position;
-        //			// end elseIf
+        const float ROTATE_CHANCE = 0.25f;
+        const float DUPLICATE_THRESHOLD = 0.99f;
 
-        float chance = Random.value;
-
-        if (chance <= pathChance)
+        if (Random.value <= pathChance)
         {
             float random = Random.value;
+            GameObject curPathmaker = pathObjectsList[i];
 
-            GameObject curPathmaker = PathObjects[i];
-
-            if (random <= 0.45f) // first 1/4 chance rotate it clockwise
+            if (random <= ROTATE_CHANCE)
             {
-                curPathmaker.transform.Rotate(new Vector3(0, 0, 90));
+                curPathmaker.transform.Rotate(Vector3.forward * 90); // Clockwise
             }
-            else if (random > 0.45f && random <= 0.9f) // 2nd 1/4 chance rotate it counterclockwise
+            else if (random <= ROTATE_CHANCE * 2)
             {
-                curPathmaker.transform.Rotate(new Vector3(0, 0, -90));
+                curPathmaker.transform.Rotate(Vector3.forward * -90); // Counter-clockwise
             }
-            else if (random > 0.99f && random < 1.0f) // fairly rare chance of duplicating itself.
+            else if (random > DUPLICATE_THRESHOLD)
             {
                 PathDuplicator(i);
             }
-            else // if it hits 1.0f
+            else if (numOfPathObject > 1 && distanceLeft <= maxPathmakerLife / 4)
             {
-                while (numOfPathObject > 1 && distanceLeft <= maxPathmakerLife/4)
-                {
-                    PathmakerExpire(curPathmaker, i, pathObjectsList); // Erase cur Pathmaker given the chance
-                    break;
-                }
+                PathmakerExpire(curPathmaker, i, pathObjectsList);
             }
         }
     }
@@ -303,21 +320,21 @@ public class Pathmaker : MonoBehaviour
 
         Vector3 curPos = PathObjects[i].transform.position;
 
-        Quaternion right = Quaternion.Euler(0, 0, -90);
-        Quaternion left = Quaternion.Euler(0, 0, 90);
+        Quaternion rotateRight = Quaternion.Euler(0, 0, -90);
+        Quaternion rotateLeft = Quaternion.Euler(0, 0, 90);
 
         if (chanceToSplit <= 0.25f)
         {
-            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, left);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, rotateLeft);
         }
-        else if (chanceToSplit > 0.25f && chanceToSplit <= 0.5f)
+        else if (chanceToSplit <= 0.5f)
         {
-            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, right);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, rotateRight);
         }
-        else // this is a special case, as it spawns two more other object of its kind 
+        else // Special case: spawns two pathmakers (left and right directions)
         {
-            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, right);
-            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, left);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, rotateRight);
+            PathmakerSpawner(pathmakerList, pathmakerPrefab, curPos, rotateLeft);
         }
     }
 
@@ -325,10 +342,6 @@ public class Pathmaker : MonoBehaviour
 
     bool FloorCreation(int i)
     {
-        // Previously had this code excuted foreach pathmaker
-
-        // God it ran smoother after I removed it. Wth?
-
         GameObject curPathmaker = PathObjects[i];
         Vector3Int curPathmakerPos = Vector3Int.FloorToInt(curPathmaker.transform.position);
         floorDualGridTilemap.DataTilemap.SetTile(curPathmakerPos, floorDualGridTilemap.DataTile);
@@ -336,53 +349,55 @@ public class Pathmaker : MonoBehaviour
         Camera.main.transform.Translate(0, 0, -0.05f * (1f - (floors / maxFloorCount)) / 2);
 
         return true;
-
-        /*
-        int a = Random.Range(0, floorGenudioSources.Count);
-        AudioSource curFloorAudioSource = floorGenudioSources[a];
-        curFloorAudioSource.Play();
-        */
     }
 
     //			Move forward ("forward", as in, the direction I'm currently facing) by 5 units;
     //			Increment counter;
 
 
-    void PathmakerUpdate(int i) // Dictates the Pathmaker to moveforward
+    void PathmakerUpdate(int i)
     {
-        // Local variables
-        int moveDistance = movementDistance;
-
         GameObject curPathmaker = PathObjects[i];
+        Vector3 curPos = curPathmaker.transform.position;
 
-        Vector3 curPathmakerPos = curPathmaker.transform.position;
-
-        if (Physics.CheckSphere(curPathmakerPos, 0.25f, pathmakerLayerMask))
+        // Handle collision
+        Collider[] hits = Physics.OverlapSphere(curPos, 0.25f, pathmakerLayerMask);
+        foreach (var hit in hits)
         {
-
-            Debug.Log("Pathmaker collided");
-
-            float random = Random.value;
-            if (random <= 0.5f)
+            if (hit.gameObject != curPathmaker)
             {
-                curPathmaker.transform.Rotate(new Vector3(0, 0, -90));
-                curPathmaker.transform.Translate(0, moveDistance, 0);
+                Debug.Log("Pathmaker collided");
+                float random = Random.value;
+                curPathmaker.transform.Rotate(0, 0, random <= 0.5f ? -90 : 90);
+                break;
             }
-            else
-            {
-                curPathmaker.transform.Rotate(new Vector3(0, 0, 90));
-                curPathmaker.transform.Translate(0, moveDistance, 0);
-            }
+        }
+
+        // Predict next move
+        Vector3 nextPos = curPathmaker.transform.position + curPathmaker.transform.up * movementDistance;
+        int nextX = Mathf.FloorToInt(nextPos.x);
+        int nextY = Mathf.FloorToInt(nextPos.y);
+
+        bool IsInBounds(int x, int y)
+        {
+            return x >= 0 && x < gridHandler.GetLength(0) &&
+                   y >= 0 && y < gridHandler.GetLength(1);
+        }
+
+        if (IsInBounds(nextX, nextY))
+        {
+            curPathmaker.transform.Translate(0, movementDistance, 0);
         }
         else
         {
-            curPathmaker.transform.Translate(0, moveDistance, 0);
+            Debug.Log("Pathmaker hit boundary, rotating");
+            curPathmaker.transform.Rotate(0, 0, 180); // Turn around
         }
     }
 
     //		Else:
     //			Destroy my game object; 		// self destruct if I've made enough tiles already
-   
+
     // This is where Pathmaker self destructs.
     IEnumerator PathmakerSelfDestruct()
     {
@@ -449,6 +464,139 @@ public class Pathmaker : MonoBehaviour
     // b. how would you tune the probabilities to generate lots of long hallways? does it... work?
     // c. tweak all the probabilities that you want... what % chance is there for a pathmaker to make a pathmaker? is that too high or too low?
 
+    // Where room and corridor system locates
+    [Header("Pathmaker Room and Corridor Properties")]
+    public int roomAttempts = 10;
+
+    public int roomMinXSize = 2;
+    public int roomMaxXSize = 4;
+    public int roomMinYSize = 4;
+    public int roomMaxYSize = 4;
+
+    public int _chanceToCreateRoom = 5;
+
+    private List<Room> rooms = new List<Room>();
+    IEnumerator RoomSpawner(Vector2Int nearPosition)
+    {
+        int attempts = 5;
+
+        while (attempts-- > 0)
+        {
+            int roomW = Random.Range(roomMinXSize, roomMaxXSize);
+            int roomH = Random.Range(roomMinYSize, roomMaxYSize);
+            int offsetX = Random.Range(-6, 6);
+            int offsetY = Random.Range(-6, 6);
+
+            Vector2Int roomPos = new Vector2Int(nearPosition.x + offsetX, nearPosition.y + offsetY);
+            Room newRoom = new Room(roomPos, roomW, roomH);
+
+            bool overlaps = false;
+            foreach (Room room in rooms)
+            {
+                if (newRoom.Bounds.Overlaps(room.Bounds))
+                {
+                    overlaps = true;
+                    break;
+                }
+            }
+
+            if (!overlaps && CreateRoom(newRoom))
+            {
+                if (rooms.Count > 1)
+                {
+                    CreateCorridor(rooms[rooms.Count - 2].Center, newRoom.Center);
+                }
+
+                yield return null;
+                break;
+            }
+        }
+    }
+
+    bool CreateRoom(Room room)
+    {
+        for (int x = room.Bounds.xMin; x < room.Bounds.xMax; x++)
+        {
+            for (int y = room.Bounds.yMin; y < room.Bounds.yMax; y++)
+            {
+                if (!IsInBounds(x, y) || gridHandler[x, y] == Grid.FLOOR)
+                    return false; // Reject room creation if floor already exists there
+            }
+        }
+
+        for (int x = room.Bounds.xMin; x < room.Bounds.xMax; x++)
+        {
+            for (int y = room.Bounds.yMin; y < room.Bounds.yMax; y++)
+            {
+                gridHandler[x, y] = Grid.FLOOR;
+                floorDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), floorDualGridTilemap.DataTile);
+                Camera.main.transform.Translate(0, 0, -0.05f * (1f - (floors / maxFloorCount)) / 2);
+                floors++;
+            }
+        }
+
+        rooms.Add(room);
+        return true;
+    }
+
+
+    void CreateCorridor(Vector2Int from, Vector2Int to)
+    {
+        Vector2Int pos = from;
+
+        while (pos.x != to.x)
+        {
+            int stepX = (to.x - pos.x) > 0 ? 1 : -1;
+            pos.x += stepX;
+
+            if (!IsInBounds(pos.x, pos.y)) break;
+
+            if (gridHandler[pos.x, pos.y] != Grid.FLOOR)
+            {
+                gridHandler[pos.x, pos.y] = Grid.FLOOR;
+                floorDualGridTilemap.DataTilemap.SetTile(new Vector3Int(pos.x, pos.y, 0), floorDualGridTilemap.DataTile);
+                Camera.main.transform.Translate(0, 0, -0.05f * (1f - (floors / maxFloorCount)) / 2);
+                floors++;
+            }
+        }
+
+        while (pos.y != to.y)
+        {
+            int stepY = (to.y - pos.y) > 0 ? 1 : -1;
+            pos.y += stepY;
+
+            if (!IsInBounds(pos.x, pos.y)) break;
+
+            if (gridHandler[pos.x, pos.y] != Grid.FLOOR)
+            {
+                gridHandler[pos.x, pos.y] = Grid.FLOOR;
+                floorDualGridTilemap.DataTilemap.SetTile(new Vector3Int(pos.x, pos.y, 0), floorDualGridTilemap.DataTile);
+                Camera.main.transform.Translate(0, 0, -0.05f * (1f - (floors / maxFloorCount)) / 2);
+                floors++;
+            }
+        }
+    }
+
+    bool IsInBounds(int x, int y)
+    {
+        return x >= 0 && x < gridHandler.GetLength(0) &&
+               y >= 0 && y < gridHandler.GetLength(1);
+    }
+
+    public class Room
+    {
+        public Vector2Int position;
+        public int width, height;
+        public RectInt Bounds => new RectInt(position.x, position.y, width, height);
+        public Vector2Int Center => new Vector2Int(position.x + width / 2, position.y + height / 2);
+
+        public Room(Vector2Int pos, int w, int h)
+        {
+            position = pos;
+            width = w;
+            height = h;
+        }
+    }
 
 
     // STEP 5: ===================================================================================
@@ -488,7 +636,7 @@ public class Pathmaker : MonoBehaviour
 
     // LevelSizeScanner utilize individual Raycast System on each spawned objects
     // It is primary used to measure potential maximum and minimum size of the level generator, both horizonally and vertically
-    
+
     IEnumerator LevelSizeScanner()
     {
         while ( true)

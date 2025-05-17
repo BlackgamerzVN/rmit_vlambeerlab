@@ -311,6 +311,7 @@ MonoBehaviour:
   _gravityForce: {x: 0, y: -1}
   _numOfConstrantRuns: 50
   _collisionSegmentInterval: 2
+  _grappleDistance: 100
   _grappleLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -324,3 +325,4 @@ MonoBehaviour:
   _bounceFactor: 1
   _maxStretch: 1
   springStrength: 0.025
+  dampingFactor: 0.5

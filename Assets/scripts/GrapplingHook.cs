@@ -76,8 +76,6 @@ public class GrapplingHook : PhysicsObject
             // Only grapple if direction is upward
             //if (dir.y > 0)
             {
-                _isGrappling = true;
-
                 //RaycastHit2D hit = Physics2D.Raycast(_rb2d.position, dir, Mathf.Infinity, _collisionMask);
 
                 RaycastHit hit = new RaycastHit();
@@ -85,6 +83,8 @@ public class GrapplingHook : PhysicsObject
                 if (Physics.Raycast(_rb2d.position, dir, out hit, maxGrappleDistance, _grappleLayer))
                 {
                     Vector3 offset = new Vector3(minMoveDistance, -minMoveDistance, 0);
+
+                    _isGrappling = true;
 
                     _grapplePoint = new Vector3(hit.point.x, hit.point.y, 0);
                     Debug.Log("Grapple Point: " + _grapplePoint);

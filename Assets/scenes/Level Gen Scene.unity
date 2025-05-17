@@ -500,7 +500,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5575b50532c45f4984a0392f98e35f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chanceToChange: 75
+  chanceToChange: 100
   floors: 0
   playerPrefabObject: {fileID: 6547699564535290312, guid: 3183f278596041d439d8f139a1131d90,
     type: 3}
@@ -521,6 +521,12 @@ MonoBehaviour:
   CameraMovementSpeed: 100
   floorDualGridTilemap: {fileID: 2011989450}
   wallDualGridTilemap: {fileID: 134829842}
+  roomAttempts: 10
+  roomMinXSize: 3
+  roomMaxXSize: 8
+  roomMinYSize: 2
+  roomMaxYSize: 4
+  _roomChance: 0.05
   CursorControllerObject: {fileID: 902134016}
 --- !u!1 &1614686136
 GameObject:
@@ -859,7 +865,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.16558382, g: 0.3528974, b: 0.5754717, a: 0}
+  m_BackGroundColor: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
