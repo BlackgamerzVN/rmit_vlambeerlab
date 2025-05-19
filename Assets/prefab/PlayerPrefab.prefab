@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 1370734351341903006}
   - component: {fileID: 4820044833691269921}
   - component: {fileID: 3133081527051523000}
-  - component: {fileID: 3797832645574949440}
   - component: {fileID: 227108290197099831}
   - component: {fileID: -5195757094403687061}
   - component: {fileID: 2997946086700916679}
@@ -151,24 +150,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.9, y: 1.8}
   m_Direction: 0
---- !u!114 &3797832645574949440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6547699564535290312}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eafc435d69f1e347b3f6e57d74466e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _minGroundNormalY: 0.65
-  _gravityModifier: 1
-  _dampingFactor: 1
-  _gravityForce: {x: 0, y: -9.8}
-  _numOfConstrantRuns: 50
-  _collisionSegmentInterval: 2
 --- !u!114 &227108290197099831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,13 +163,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _minGroundNormalY: 0.65
-  _gravityModifier: 1
+  _gravityModifier: 2
   _dampingFactor: 1
   _gravityForce: {x: 0, y: -9.8}
   _numOfConstrantRuns: 50
-  _collisionSegmentInterval: 50
-  _maxSpeed: 7
+  _collisionSegmentInterval: 2
+  _movementSpeed: 7
   _jumpTakeOffSpeed: 15
+  _dashSpeed: 15
+  _dashDuration: 0.5
+  _dashCooldown: 1
 --- !u!120 &-5195757094403687061
 LineRenderer:
   serializedVersion: 2

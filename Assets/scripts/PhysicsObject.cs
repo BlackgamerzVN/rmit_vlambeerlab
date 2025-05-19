@@ -9,6 +9,7 @@ public class PhysicsObject : MonoBehaviour
     [SerializeField] private float _gravityModifier = 1f;
     [SerializeField] protected float _dampingFactor = 1f;
     [SerializeField] protected Vector2 _gravityForce = new Vector2(0, -9.8f);
+    protected bool _gravityEnabled = true;
 
     protected Vector2 _targetVelocity;
     protected Rigidbody2D _rb2d;
@@ -47,9 +48,39 @@ public class PhysicsObject : MonoBehaviour
     // Why Protected Virtual Void? It's this code equivalent of adding USB slots into your computer.
     // Additionally Protected Virtual Void grant asset of protected variables to selected key Addons.
     // Physic behaves normally even under the adsent of additional addons. Any uninserted addons will return Null and uncomputed.
-
+    /// <summary>
+    /// Where player input is primarily applied
+    /// </summary>
     protected virtual void ComputeVelocity()
     {
+        
+    }
+    /// <summary>
+    /// Applies gravity, moves object, and handles collisions.
+    /// </summary>
+    protected virtual void ComputeGravity(bool isUnderGravityForce) // Should no plug in available, fall backs to following default
+    {
+        // Provide final velocity and ultimately, location.
+        if (isUnderGravityForce)
+        {
+            _velocity += _gravityModifier * _gravityForce * Time.deltaTime;
+        }
+
+        // Override x velocity from input
+        _velocity.x = _targetVelocity.x;
+
+        _isGrounded = false; // Reset grounded flag
+
+        Vector2 deltaPosition = _velocity * Time.deltaTime;
+
+        // Move along the ground for horizontal movement
+        Vector2 moveAlongGround = new Vector2(_groundNormal.y, -_groundNormal.x);
+        Vector2 move = moveAlongGround * deltaPosition.x;
+        Movement(move, false);
+
+        // Apply vertical movement
+        move = Vector2.up * deltaPosition.y;
+        Movement(move, true);
 
     }
     protected virtual void ComputeTeleportation()
@@ -83,26 +114,8 @@ public class PhysicsObject : MonoBehaviour
     }
     void FixedUpdate()
     {
-        // Provide final velocity and ultimately, location.
-        _velocity += _gravityModifier * _gravityForce * Time.deltaTime;
-        _velocity.x = _targetVelocity.x;
-
-        _isGrounded = false;
-
-        Vector2 deltaPosition = _velocity * Time.deltaTime;
-
-        Vector2 moveAlongGround = new Vector2(_groundNormal.y, -_groundNormal.x);
-
-        Vector2 move = moveAlongGround * deltaPosition.x;
-
-        // Second value of Movement() excecute whenever the object is moving on Y axis
-
-        Movement(move, false);
-
-        move = Vector2.up * deltaPosition.y;
-
-        Movement(move, true);
-
+        ComputeGravity(_gravityEnabled);
+        
         // Checks if the object is under influence of gravity
         ComputeGrapplingHookSimulate(_isGrounded);
 
@@ -110,7 +123,7 @@ public class PhysicsObject : MonoBehaviour
         {
             ComputeGrapplingHookApplyConstraints();
 
-            // Checks if i is divisable by 0
+            // Run collision handling every _collisionSegmentInterval iterations
             if (_collisionSegmentInterval > 0 && i % _collisionSegmentInterval == 0)
             {
                 ComputeGrapplingHookHandleCollision();
@@ -121,7 +134,9 @@ public class PhysicsObject : MonoBehaviour
     protected bool _isGrounded;
 
     protected Vector2 _groundNormal;
-
+    /// <summary>
+    /// Performs a collision-aware movement step.
+    /// </summary>
     void Movement (Vector2 move, bool yMovement)
     {
         float distance = move.magnitude;
@@ -139,6 +154,8 @@ public class PhysicsObject : MonoBehaviour
             for (int i = 0;i < _hitBufferList.Count; i++)
             {
                 Vector2 currentNormal = _hitBufferList[i].normal;
+
+                // Check for ground contact
                 if (currentNormal.y > _minGroundNormalY)
                 {
                     _isGrounded = true;
@@ -146,10 +163,11 @@ public class PhysicsObject : MonoBehaviour
                     if (yMovement)
                     {
                         _groundNormal = currentNormal;
-                        currentNormal.x = 0;
+                        currentNormal.x = 0; // Prevent horizontal interference
                     }
                 }
 
+                // Remove velocity component into the surface
                 float projection = Vector2.Dot(_velocity, currentNormal);
 
                 if (projection < 0)
@@ -157,8 +175,8 @@ public class PhysicsObject : MonoBehaviour
                     _velocity -= projection * currentNormal;
                 }
 
+                // Adjust movement to avoid overlap
                 float modifiedDistance = _hitBufferList[i].distance - _shellRadius;
-
                 distance = modifiedDistance < distance ? modifiedDistance : distance;
                 // Equivalent to distance = Mathf.Min(modifiedDistance, distance);
             }

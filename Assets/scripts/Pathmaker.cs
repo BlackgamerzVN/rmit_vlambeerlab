@@ -93,14 +93,15 @@ public class Pathmaker : MonoBehaviour
     {
         FLOOR,
         WALL,
+        PLATFORM,
         EMPTY
     }
     // Variables
     public Grid[,] gridHandler;
 
     public DualGridTilemapModule floorDualGridTilemap;
-
     public DualGridTilemapModule wallDualGridTilemap;
+    public DualGridTilemapModule platformDuelGridTileMap;
 
     void Start()
     {
@@ -822,14 +823,14 @@ public class Pathmaker : MonoBehaviour
                y >= 0 && y < gridHandler.GetLength(1);
     }
 
-    private void PlaceWallTile(Vector3Int pos)
+    private void PlacePlatformTile(Vector3Int pos)
     {
-        wallDualGridTilemap.DataTilemap.SetTile(pos, wallDualGridTilemap.DataTile);
+        platformDuelGridTileMap.DataTilemap.SetTile(pos, platformDuelGridTileMap.DataTile);
         floorDualGridTilemap.DataTilemap.SetTile(pos, null);
-        gridHandler[pos.x, pos.y] = Grid.WALL;
+        gridHandler[pos.x, pos.y] = Grid.PLATFORM;
     }
 
-    public bool WallTilePlacement(Vector3Int tilePos)
+    public bool PlatformTilePlacement(Vector3Int tilePos)
     {
         int x = tilePos.x;
         int y = tilePos.y;
@@ -847,35 +848,13 @@ public class Pathmaker : MonoBehaviour
             gridHandler[x - 1, y] == Grid.FLOOR &&
             gridHandler[x + 1, y] == Grid.FLOOR)
         {
-            PlaceWallTile(tilePos);
-            PlaceWallTile(tilePos + Vector3Int.left);
-            PlaceWallTile(tilePos + Vector3Int.right);
+            PlacePlatformTile(tilePos);
+            PlacePlatformTile(tilePos + Vector3Int.left);
+            PlacePlatformTile(tilePos + Vector3Int.right);
             return true;
         }
 
         return false;
-    }
-
-    public void FloorTilePlacement(Vector3Int tilePos)
-    {
-        if (gridHandler[tilePos.x, tilePos.y] == Grid.WALL)
-        {
-            wallDualGridTilemap.DataTilemap.SetTile(tilePos, null);
-            floorDualGridTilemap.DataTilemap.SetTile(tilePos, floorDualGridTilemap.DataTile);
-            gridHandler[tilePos.x, tilePos.y] = Grid.FLOOR;
-
-            int x = tilePos.x;
-            int y = tilePos.y;
-
-            WallGenerator(x + 1, y);
-            WallGenerator(x - 1, y);
-            WallGenerator(x, y + 1);
-            WallGenerator(x, y - 1);
-            WallGenerator(x + 1, y - 1);
-            WallGenerator(x - 1, y - 1);
-            WallGenerator(x + 1, y + 1);
-            WallGenerator(x - 1, y + 1);
-        }
     }
 
     // WALL GENERATION
@@ -953,6 +932,19 @@ public class Pathmaker : MonoBehaviour
 
     bool FloorGenerator(int x, int y)
     {
+        if (gridHandler[x, y] == Grid.PLATFORM)
+        {
+            // Clear wall tile in current position
+            platformDuelGridTileMap.DataTilemap.SetTile(new Vector3Int(x, y, 0), null);
+            // Set floor tile in current position
+            floorDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), floorDualGridTilemap.DataTile);
+            // Redesignate this tile as FLOOR tile
+            gridHandler[x, y] = Grid.FLOOR;
+            // calls true
+            return true;
+        }
+        /*
+         * Legacy codes. Now prefer to platform grids instead
         if (gridHandler[x, y] == Grid.EMPTY)
         {
             // Set floor tile in current position
@@ -974,6 +966,7 @@ public class Pathmaker : MonoBehaviour
             // calls true
             return true;
         }
+        */
         return false;
     }
 

@@ -85,7 +85,7 @@ public class GrapplingHook : PhysicsObject
                     Vector3 offset = new Vector3(minMoveDistance, -minMoveDistance, 0);
 
                     _isGrappling = true;
-
+                    _gravityEnabled = false;
                     _grapplePoint = new Vector3(hit.point.x, hit.point.y, 0);
                     Debug.Log("Grapple Point: " + _grapplePoint);
 
@@ -113,11 +113,12 @@ public class GrapplingHook : PhysicsObject
         {
             _lineRenderer.enabled = false;
             _isGrappling = false;
+            _gravityEnabled = true;
 
             _ropeSegments.Clear(); // More efficient and safer than a for-loop
         }
     }
-
+    
     // Compute drawing vectors for Verlet Integration ropes.
     protected override void ComputeGrapplingHookDraw()
     {
@@ -157,7 +158,7 @@ public class GrapplingHook : PhysicsObject
         }
     }
     // Compute constraints for Verlet Integration ropes.
-    private void ApplyConstraintsToSegment(int i)
+    private void ApplyConstraintsToSegment(int i, bool isCurrentlyGrappling)
     {
         if (i < 0 || i >= _ropeSegments.Count - 1) return;
 
@@ -212,7 +213,6 @@ public class GrapplingHook : PhysicsObject
     {
         // Use MovePosition to move Rigidbody smoothly according to physics
         _rb2d.MovePosition(Vector2.MoveTowards(_rb2d.position, nextSeg.CurrentPosition,5f));
-        _velocity.y = 0f;
     }
 
     private void ApplyDamping(ref Vector2 changeVector)
@@ -234,7 +234,7 @@ public class GrapplingHook : PhysicsObject
             // Apply constraints for each rope segment
             for (int i = 0; i < _numOfRopeSegments - 1; i++)
             {
-                ApplyConstraintsToSegment(i);
+                ApplyConstraintsToSegment(i, _isGrappling);
             }
         }
     }
