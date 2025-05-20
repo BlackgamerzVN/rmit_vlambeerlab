@@ -625,6 +625,8 @@ MonoBehaviour:
   floors: 0
   playerPrefabObject: {fileID: 6547699564535290312, guid: 3183f278596041d439d8f139a1131d90,
     type: 3}
+  debrisPrefabObject: {fileID: 5200922964694274340, guid: 1e145850d0a05d1439dddd22194e3cf3,
+    type: 3}
   PathObjects: []
   pathmakerLayerMask:
     serializedVersion: 2
@@ -645,7 +647,7 @@ MonoBehaviour:
   platformDuelGridTileMap: {fileID: 1542700088}
   roomAttempts: 10
   roomMinXSize: 3
-  roomMaxXSize: 8
+  roomMaxXSize: 6
   roomMinYSize: 2
   roomMaxYSize: 4
   _chanceToCreateRoom: 5

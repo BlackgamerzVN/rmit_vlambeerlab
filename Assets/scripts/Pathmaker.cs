@@ -45,6 +45,8 @@ public class Pathmaker : MonoBehaviour
 
     public GameObject playerPrefabObject;
 
+    public GameObject debrisPrefabObject;
+
     [Header("Pathmaker Prefab Properties")]
 
     [SerializeField]
@@ -794,6 +796,7 @@ public class Pathmaker : MonoBehaviour
                 }
             }
         }
+        /*
         // Once done refill the outer with wall tiles
         for (int y = curY + r; y >= curY - r; y--)
         {
@@ -816,6 +819,7 @@ public class Pathmaker : MonoBehaviour
                 }
             }
         }
+        */
     }
     private bool IsWithinBounds(int x, int y)
     {
@@ -823,11 +827,15 @@ public class Pathmaker : MonoBehaviour
                y >= 0 && y < gridHandler.GetLength(1);
     }
 
-    private void PlacePlatformTile(Vector3Int pos)
+    private void PlacePlatformTile(Vector3Int tilePos)
     {
-        platformDuelGridTileMap.DataTilemap.SetTile(pos, platformDuelGridTileMap.DataTile);
-        floorDualGridTilemap.DataTilemap.SetTile(pos, null);
-        gridHandler[pos.x, pos.y] = Grid.PLATFORM;
+        bool wallAndEmptyCheck = (gridHandler[tilePos.x, tilePos.y] == Grid.WALL || gridHandler[tilePos.x, tilePos.y] == Grid.EMPTY);
+        if (!wallAndEmptyCheck)
+        {
+            platformDuelGridTileMap.DataTilemap.SetTile(tilePos, platformDuelGridTileMap.DataTile);
+            floorDualGridTilemap.DataTilemap.SetTile(tilePos, null);
+            gridHandler[tilePos.x, tilePos.y] = Grid.PLATFORM;
+        }
     }
 
     public bool PlatformTilePlacement(Vector3Int tilePos)
@@ -841,12 +849,11 @@ public class Pathmaker : MonoBehaviour
             !IsWithinBounds(x + 1, y))
             return false;
 
+        bool firstCheck = gridHandler[x, y + 2] == Grid.FLOOR || gridHandler[x, y + 2] == Grid.PLATFORM;
+        bool secondCheck = gridHandler[x, y + 1] == Grid.FLOOR || gridHandler[x, y + 1] == Grid.PLATFORM || gridHandler[x, y + 1] == Grid.WALL;
+
         // Check that all involved tiles are FLOOR
-        if (gridHandler[x, y] == Grid.FLOOR &&
-            gridHandler[x, y + 1] == Grid.FLOOR &&
-            gridHandler[x, y + 2] == Grid.FLOOR &&
-            gridHandler[x - 1, y] == Grid.FLOOR &&
-            gridHandler[x + 1, y] == Grid.FLOOR)
+        if (firstCheck && secondCheck)
         {
             PlacePlatformTile(tilePos);
             PlacePlatformTile(tilePos + Vector3Int.left);
@@ -934,10 +941,13 @@ public class Pathmaker : MonoBehaviour
     {
         if (gridHandler[x, y] == Grid.PLATFORM)
         {
+            Vector3Int location = new Vector3Int(x, y, 0);
             // Clear wall tile in current position
-            platformDuelGridTileMap.DataTilemap.SetTile(new Vector3Int(x, y, 0), null);
+            platformDuelGridTileMap.DataTilemap.SetTile(location, null);
             // Set floor tile in current position
-            floorDualGridTilemap.DataTilemap.SetTile(new Vector3Int(x, y, 0), floorDualGridTilemap.DataTile);
+            floorDualGridTilemap.DataTilemap.SetTile(location, floorDualGridTilemap.DataTile);
+            // Instantiate a GameObject when the tile is removed
+            Instantiate(debrisPrefabObject, location + new Vector3(0.5f, 0.5f, 0.25f), Quaternion.Euler(0,0,0));
             // Redesignate this tile as FLOOR tile
             gridHandler[x, y] = Grid.FLOOR;
             // calls true

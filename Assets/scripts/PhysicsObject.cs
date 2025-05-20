@@ -39,7 +39,6 @@ public class PhysicsObject : MonoBehaviour
     {
         _targetVelocity = Vector2.zero;
         ComputeVelocity();
-        ComputeTeleportation();
         ComputeGrapplingHook();
         ComputeGrapplingHookDraw();
     }
@@ -81,10 +80,6 @@ public class PhysicsObject : MonoBehaviour
         // Apply vertical movement
         move = Vector2.up * deltaPosition.y;
         Movement(move, true);
-
-    }
-    protected virtual void ComputeTeleportation()
-    {
 
     }
     protected virtual void ComputeGrapplingHook()
@@ -153,7 +148,8 @@ public class PhysicsObject : MonoBehaviour
 
             for (int i = 0;i < _hitBufferList.Count; i++)
             {
-                Vector2 currentNormal = _hitBufferList[i].normal;
+                RaycastHit2D hit = _hitBufferList[i];
+                Vector2 currentNormal = hit.normal;
 
                 // Check for ground contact
                 if (currentNormal.y > _minGroundNormalY)
@@ -164,6 +160,25 @@ public class PhysicsObject : MonoBehaviour
                     {
                         _groundNormal = currentNormal;
                         currentNormal.x = 0; // Prevent horizontal interference
+                    }
+                }
+
+                // === PUSH LOGIC FOR KINEMATIC BODIES ===
+                Rigidbody2D hitBody = hit.rigidbody;
+                if (hitBody != null && hitBody.bodyType == RigidbodyType2D.Kinematic && hitBody != _rb2d)
+                {
+                    // Calculate push direction (opposite of the normal)
+                    Vector2 pushDirection = move.normalized;
+                    float pushDistance = distance - hit.distance + _shellRadius;
+
+                    // Only push if push distance is meaningful
+                    if (pushDistance > 0.001f)
+                    {
+                        // Attempt to move the hit kinematic body
+                        Vector2 targetPosition = hitBody.position + pushDirection * pushDistance;
+
+                        // Optional: You could raycast or check for obstacles before moving
+                        hitBody.MovePosition(targetPosition);
                     }
                 }
 
@@ -181,11 +196,9 @@ public class PhysicsObject : MonoBehaviour
                 // Equivalent to distance = Mathf.Min(modifiedDistance, distance);
             }
         }
-
         if (move.sqrMagnitude > 0.0001f)
         {
             _rb2d.position += move.normalized * distance;
         }
-
     }
 }
