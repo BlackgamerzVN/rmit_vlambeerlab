@@ -1,30 +1,34 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\",
+  "WorkspaceRootPath": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\pathmaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pathmaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\s4043089\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\kinematicobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\kinematicobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\cursor controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cursor controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\physicsobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\physicsobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\playerplatformercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\playerplatformercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playerplatformercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\grapplinghook.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\admin\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\levelendtrigger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\levelendtrigger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\admin\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\uihealthbar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\uihealthbar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\admin\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\assets\\scripts\\damager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\damager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\admin\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\grapplinghook.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\grapplinghook.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|c:\\users\\admin\\documents\\github\\rmit_vlambeerlab\\assets\\scripts\\pathmaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{58B57050-4164-C5E4-3759-123683C3D75E}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pathmaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,84 +38,97 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "KinematicObject.cs",
-              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\KinematicObject.cs",
-              "RelativeDocumentMoniker": "Assets\\scripts\\KinematicObject.cs",
-              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\KinematicObject.cs",
-              "RelativeToolTip": "Assets\\scripts\\KinematicObject.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-20T04:56:31.112Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "PhysicsObject.cs",
-              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\PhysicsObject.cs",
-              "RelativeDocumentMoniker": "Assets\\scripts\\PhysicsObject.cs",
-              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\PhysicsObject.cs",
-              "RelativeToolTip": "Assets\\scripts\\PhysicsObject.cs",
-              "ViewState": "AgIAAC0AAAAAAAAAAAAUwMsAAAABAAAAAAAAAA==",
+              "Title": "GameManager.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\GameManager.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\GameManager.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\GameManager.cs",
+              "RelativeToolTip": "Assets\\scripts\\GameManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T11:03:54.167Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "PlayerPlatformerController.cs",
-              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\PlayerPlatformerController.cs",
-              "RelativeDocumentMoniker": "Assets\\scripts\\PlayerPlatformerController.cs",
-              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\PlayerPlatformerController.cs",
-              "RelativeToolTip": "Assets\\scripts\\PlayerPlatformerController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T05:33:55.347Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Pathmaker.cs",
-              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
-              "RelativeDocumentMoniker": "Assets\\scripts\\Pathmaker.cs",
-              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
-              "RelativeToolTip": "Assets\\scripts\\Pathmaker.cs",
-              "ViewState": "AgIAAAwDAAAAAAAAAAAlwD8DAABTAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T05:33:08.345Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Cursor Controller.cs",
-              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Cursor Controller.cs",
-              "RelativeDocumentMoniker": "Assets\\scripts\\Cursor Controller.cs",
-              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Cursor Controller.cs",
-              "RelativeToolTip": "Assets\\scripts\\Cursor Controller.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAArAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T05:32:56.964Z",
+              "WhenOpened": "2025-05-22T18:03:06.705Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
               "Title": "GrapplingHook.cs",
-              "DocumentMoniker": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\GrapplingHook.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\GrapplingHook.cs",
               "RelativeDocumentMoniker": "Assets\\scripts\\GrapplingHook.cs",
-              "ToolTip": "C:\\Users\\s4043089\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\GrapplingHook.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\GrapplingHook.cs",
               "RelativeToolTip": "Assets\\scripts\\GrapplingHook.cs",
-              "ViewState": "AgIAAEcAAAAAAAAAAAApwHMAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAABQAAAAAAAAAAAAQwE8AAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T04:14:55.185Z",
+              "WhenOpened": "2025-05-22T17:51:49.221Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UIHealthBar.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\UIHealthBar.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\UIHealthBar.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\UIHealthBar.cs",
+              "RelativeToolTip": "Assets\\scripts\\UIHealthBar.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAawDcAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T17:40:13.976Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LevelEndTrigger.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\LevelEndTrigger.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\LevelEndTrigger.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\LevelEndTrigger.cs",
+              "RelativeToolTip": "Assets\\scripts\\LevelEndTrigger.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T17:32:01.953Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Damager.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Damager.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\Damager.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Damager.cs",
+              "RelativeToolTip": "Assets\\scripts\\Damager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T17:19:02.134Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PlayerPlatformerController.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\PlayerPlatformerController.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\PlayerPlatformerController.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\PlayerPlatformerController.cs",
+              "RelativeToolTip": "Assets\\scripts\\PlayerPlatformerController.cs",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAcwPUAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T17:01:59.228Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Pathmaker.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\Pathmaker.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\rmit_vlambeerlab\\Assets\\scripts\\Pathmaker.cs",
+              "RelativeToolTip": "Assets\\scripts\\Pathmaker.cs",
+              "ViewState": "AgIAAMIAAAAAAAAAAAAIwEIDAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T17:01:48.223Z",
               "EditorCaption": ""
             }
           ]

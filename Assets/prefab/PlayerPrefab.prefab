@@ -168,11 +168,13 @@ MonoBehaviour:
   _gravityForce: {x: 0, y: -9.8}
   _numOfConstrantRuns: 50
   _collisionSegmentInterval: 2
+  _maxHealth: 5
   _movementSpeed: 7
   _jumpTakeOffSpeed: 15
   _dashSpeed: 15
   _dashDuration: 0.5
   _dashCooldown: 1
+  _invincibilityDuration: 1
 --- !u!120 &-5195757094403687061
 LineRenderer:
   serializedVersion: 2
@@ -295,7 +297,7 @@ MonoBehaviour:
   _gravityForce: {x: 0, y: -1}
   _numOfConstrantRuns: 50
   _collisionSegmentInterval: 2
-  _grappleDistance: 100
+  _grappleDistance: 20
   _grappleLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -306,7 +308,7 @@ MonoBehaviour:
     m_Bits: 128
   _collisionRadius: 0.05
   _maxCollisionRadius: 0.5
-  _bounceFactor: 1
+  _bounceFactor: 0.25
   _maxStretch: 1
   springStrength: 0.025
-  dampingFactor: 0.5
+  dampingFactor: 0.25

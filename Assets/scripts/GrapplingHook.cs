@@ -68,9 +68,7 @@ public class GrapplingHook : PhysicsObject
             mousePos = Camera.main.ScreenToWorldPoint(mousePos);
             //Debug.Log("C2: " + mousePos.ToString());
 
-            Vector2 directionVector = (Vector2)mousePos - _rb2d.position;
-            Vector2 dir = directionVector.normalized;
-            float dist = directionVector.magnitude;
+            Vector2 dir = ((Vector2)mousePos - _rb2d.position).normalized;
             Debug.Log("Click Direction: " + dir);
 
             // Only grapple if direction is upward
@@ -83,6 +81,8 @@ public class GrapplingHook : PhysicsObject
                 if (Physics.Raycast(_rb2d.position, dir, out hit, maxGrappleDistance, _grappleLayer))
                 {
                     Vector3 offset = new Vector3(minMoveDistance, -minMoveDistance, 0);
+                    Vector2 hitPosition = new Vector2(hit.point.x, hit.point.y);
+                    float dist = (hitPosition - _rb2d.position).magnitude;
 
                     _isGrappling = true;
                     _gravityEnabled = false;

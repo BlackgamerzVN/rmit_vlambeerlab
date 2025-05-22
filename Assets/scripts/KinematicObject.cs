@@ -13,7 +13,7 @@ public class KinematicObject : PhysicsObject
         }
         else // failsafe
         {
-            Destroy(gameObject, 1f);
+            Destroy(gameObject, 3f);
         }
     }
     protected override void ComputeGravity(bool isUnderGravityForce)

@@ -44,8 +44,9 @@ public class Pathmaker : MonoBehaviour
     //	Declare a public Transform called pathmakerSpherePrefab, assign the prefab in inspector; 		// you'll have to make a "pathmakerSphere" prefab later
 
     public GameObject playerPrefabObject;
-
+    public GameObject levelEndPrefabObject;
     public GameObject debrisPrefabObject;
+    public List<GameObject> trapPrefabObject;
 
     [Header("Pathmaker Prefab Properties")]
 
@@ -96,6 +97,8 @@ public class Pathmaker : MonoBehaviour
         FLOOR,
         WALL,
         PLATFORM,
+        PLAYERSPAWN,
+        LEVELEND,
         EMPTY
     }
     // Variables
@@ -829,8 +832,8 @@ public class Pathmaker : MonoBehaviour
 
     private void PlacePlatformTile(Vector3Int tilePos)
     {
-        bool wallAndEmptyCheck = (gridHandler[tilePos.x, tilePos.y] == Grid.WALL || gridHandler[tilePos.x, tilePos.y] == Grid.EMPTY);
-        if (!wallAndEmptyCheck)
+        bool floorCheck = gridHandler[tilePos.x, tilePos.y] == Grid.FLOOR;
+        if (floorCheck)
         {
             platformDuelGridTileMap.DataTilemap.SetTile(tilePos, platformDuelGridTileMap.DataTile);
             floorDualGridTilemap.DataTilemap.SetTile(tilePos, null);
@@ -991,31 +994,89 @@ public class Pathmaker : MonoBehaviour
         {
             for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
             {
-                if (playerSpawned) yield break;
-
                 bool floorCheck = false;
 
-                // Runs a first check if the area it's scanning on is floor
+                // Runs a first check if the area it's scanning on is floor and the tile below it is Wall tile
                 floorCheck |= FloorCheck(x, y);
 
                 // Run a 2nd check based on the first check if there's a wall tile under a floor tile
-
                 // Inside WallCheck there is additional check for the chance to player to spawn in
-
                 // If all checks satisfied, loop ends
 
                 if (floorCheck == true && playerSpawned == false)
                 {
-                    playerSpawned |= WallCheckForPlayer(x, y);
+                    playerSpawned |= PlayerCheck(x, y);
                     yield return null;
                 }
             }
         }
+        StartCoroutine(LevelEndSpanwer());
+    }
+    IEnumerator LevelEndSpanwer()
+    {
+        bool playerSpawned = false;
+        // scan lowest vector3Int in Y axis.
+        for (int y = 0; y < gridHandler.GetLength(1) - 1; y++)
+        {
+            for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
+            {
+                bool floorCheck = false;
+
+                // Runs a first check if the area it's scanning on is floor and the tile below it is Wall tile
+                floorCheck |= FloorCheck(x, y);
+
+                // Run a 2nd check based on the first check if there's a wall tile under a floor tile
+                // Inside WallCheck there is additional check for the chance to player to spawn in
+                // If all checks satisfied, loop ends
+
+                if (floorCheck == true && playerSpawned == false)
+                {
+                    playerSpawned |= LevelEndCheck(x, y);
+                    yield return null;
+                }
+            }
+        }
+        StartCoroutine(TrapSpanwer());
+    }
+    IEnumerator TrapSpanwer()
+    {
+        // scan lowest vector3Int in Y axis.
+        for (int y = 0; y < gridHandler.GetLength(1) - 1; y++)
+        {
+            for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
+            {
+                bool floorCheck = false;
+                bool cellingCheck = false;
+
+                // Runs a first check if the area it's scanning on is floor and the tile below it is Wall tile
+                floorCheck |= FloorCheck(x, y);
+                cellingCheck |= CellingCheck(x, y);
+
+                // Run a 2nd check based on the first check if there's a wall tile under a floor tile
+                // Inside WallCheck there is additional check for the chance to player to spawn in
+                // If all checks satisfied, loop ends
+
+                if (floorCheck && !cellingCheck)
+                {
+                    TrapCheck(x, y);
+                    yield return null;
+                }
+            }
+        }
+        PlayerTrueSpawn();
     }
 
     public bool FloorCheck(int x, int y)
     {
-        if (gridHandler[x, y] == Grid.FLOOR)
+        if (gridHandler[x, y] == Grid.FLOOR && gridHandler[x, y - 1] == Grid.WALL)
+        {
+            return true;
+        }
+        return false;
+    }
+    public bool CellingCheck(int x, int y)
+    {
+        if (gridHandler[x, y] == Grid.FLOOR && gridHandler[x, y + 1] == Grid.WALL)
         {
             return true;
         }
@@ -1023,22 +1084,63 @@ public class Pathmaker : MonoBehaviour
     }
 
 
-    bool WallCheckForPlayer(int x, int y)
+    bool PlayerCheck(int x, int y)
     {
-        if (gridHandler[x, y - 1] == Grid.WALL)
+        float playerSpawnChance = Random.value;
+
+        if (playerSpawnChance <= 0.25f)
         {
-            float playerSpawnChance = Random.value;
+            gridHandler[x, y] = Grid.PLAYERSPAWN;
 
-            if (playerSpawnChance < 0.25f)
+            return true;
+        }
+        return false;
+    }
+    void PlayerTrueSpawn()
+    {
+        for (int y = 0; y < gridHandler.GetLength(1) - 1; y++)
+        {
+            for (int x = 0; x < gridHandler.GetLength(0) - 1; x++)
             {
-                Vector3 curPos = new Vector3(x , y, 0);
+                if (gridHandler[x,y] == Grid.PLAYERSPAWN)
+                {
+                    Vector3 curPos = new Vector3(x, y, 0);
 
-                GameObject playerObject = Instantiate(playerPrefabObject, curPos + new Vector3(0.5f, 0.5f, 0), Quaternion.Euler(0,0,0));
-
-                StartCoroutine(PlayerTracker(playerObject));
-
-                return true;
+                    GameObject playerObject = Instantiate(playerPrefabObject, curPos + new Vector3(0.5f, 0.5f, 0), Quaternion.Euler(0, 0, 0));
+                }
             }
+        }
+    }
+    bool LevelEndCheck(int x, int y)
+    {
+        float playerSpawnChance = Random.value;
+
+        if (playerSpawnChance <= 0.25f)
+        {
+            gridHandler[x, y] = Grid.LEVELEND;
+
+            Vector3 curPos = new Vector3(x, y, 0);
+
+            GameObject exitObject = Instantiate(levelEndPrefabObject, curPos + new Vector3(0.5f, 0.5f, 0), Quaternion.Euler(0, 0, 0));
+
+            return true;
+        }
+        return false;
+    }
+    bool TrapCheck(int x, int y)
+    {
+        float playerSpawnChance = Random.value;
+
+        if (playerSpawnChance <= 0.25f)
+        {
+            Vector3 curPos = new Vector3(x, y, 0);
+
+            int i = Random.Range(0, trapPrefabObject.Count);
+            GameObject trapObject = trapPrefabObject[i];
+
+            Instantiate(trapObject, curPos + new Vector3(0.5f, 0.5f, 0), Quaternion.Euler(0, 0, 0));
+
+            return true;
         }
         return false;
     }
