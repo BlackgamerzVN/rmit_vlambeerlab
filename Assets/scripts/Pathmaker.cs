@@ -9,7 +9,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
 
 // INTRO TO PROC GEN LAB
 // all students: complete steps 1-6, as listed in this file

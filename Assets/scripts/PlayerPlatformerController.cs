@@ -7,6 +7,7 @@ public class PlayerPlatformerController : PhysicsObject
 {
     [Header("Local Player Settings")]
     [SerializeField] private int _maxHealth = 5;
+    [SerializeField] private Animator _animator;
     private int _currentHealth;
 
     public int CurrentHealth => _currentHealth;
@@ -21,6 +22,7 @@ public class PlayerPlatformerController : PhysicsObject
     [SerializeField] private float _dashSpeed = 10f;
     [SerializeField] private float _dashDuration = 0.2f;
     [SerializeField] private float _dashCooldown = 1f;
+    [SerializeField] private AudioSource _movementAudio;
 
     [Header("References")]
     private Pathmaker pathmaker;
@@ -30,6 +32,7 @@ public class PlayerPlatformerController : PhysicsObject
     private bool _isMoving = true;
     private bool _isSlamming = false;
     private bool _isDashing = false;
+    private bool _isJumping = false;
 
     private float _dashTimeRemaining = 0f;
     private float _dashCooldownTimer = 0f;
@@ -77,8 +80,8 @@ public class PlayerPlatformerController : PhysicsObject
         _mainCamera = Camera.main;
         _isMoving = true;
         _isSlamming = false;
+        _isJumping = false;
 
-        
     }
     protected override void ComputeVelocity()
     {
@@ -106,6 +109,8 @@ public class PlayerPlatformerController : PhysicsObject
         }
 
         HandleGravityToggle();
+        HandleMoveAnimation(ref move);
+        HandleYAnimation(ref _velocity.y);
 
         _targetVelocity = move * _movementSpeed;
 
@@ -129,6 +134,10 @@ public class PlayerPlatformerController : PhysicsObject
     private void HandleMovementInput(ref Vector2 move)
     {
         move.x = Input.GetAxis("Horizontal");
+        if (!IsPlayerInputtingMovement && _isGrounded)
+        {
+            MovementAudio();
+        }
     }
     private void HandleDashInput()
     {
@@ -144,10 +153,16 @@ public class PlayerPlatformerController : PhysicsObject
         if (Input.GetButtonDown("Jump") && _isGrounded)
         {
             _velocity.y = _jumpTakeOffSpeed;
+            HandleJumpAnimation();
+            _isJumping = true;
         }
         else if (Input.GetButtonUp("Jump") && _velocity.y > 0)
         {
             _velocity.y *= 0.5f; // cut jump height when button is released
+        }
+        if (_isGrounded)
+        {
+            _isJumping = false;
         }
     }
     private void HandleSlamInput()
@@ -351,5 +366,32 @@ public class PlayerPlatformerController : PhysicsObject
     {
         base.ComputeGravity(_gravityEnabled);
     }
+    #endregion
+
+    #region Animation
+
+    private void HandleMoveAnimation(ref Vector2 move)
+    {
+        _animator.SetFloat("xVelocity", move.x);
+    }
+    private void HandleYAnimation(ref float yVelocity)
+    {
+        _animator.SetFloat("yVelocity", yVelocity);
+        _animator.SetBool("IsJumping", _isJumping);
+    }
+    private void HandleJumpAnimation()
+    {
+        _animator.SetBool("IsJumping", true);
+    }
+
+    #endregion
+
+    #region Audio
+
+    private void MovementAudio()
+    {
+        _movementAudio.Play();
+    }
+
     #endregion
 }
